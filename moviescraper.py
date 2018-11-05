@@ -35,7 +35,7 @@ def extract_movies(dom):
     f = open(filename, "w")
 
     # create header, start writing to file
-    headers = "title, rating, year, actors, runtime\n"
+    headers = "title,rating,year,actors,runtime\n"
     f.write(headers)
 
     for container in containers:
@@ -54,7 +54,7 @@ def extract_movies(dom):
         year = year[0].text.replace("(", "")
         year = year.replace(")", "")
         year = year.replace("I", "")
-
+        year = year.replace(" ", "")
 
         # grab runtime, remove unnessary parts
         runtime = container.findAll("span",{"class": "runtime"})
@@ -75,14 +75,8 @@ def extract_movies(dom):
 
     f.close()
 
+# not neseccary
 # def save_csv(outfile, movies):
-#     """
-#     Output a CSV file containing highest rated movies.
-#     """
-#     writer = csv.writer(outfile)
-#     writer.writerow(['Title', 'Rating', 'Year', 'Actors', 'Runtime'])
-#
-#     # ADD SOME CODE OF YOURSELF HERE TO WRITE THE MOVIES TO DISK
 
 
 def simple_get(url):
