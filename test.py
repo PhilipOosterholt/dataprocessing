@@ -1,7 +1,12 @@
+import csv
+from requests import get
+from requests.exceptions import RequestException
+from contextlib import closing
 from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen as ureq
 
-my_url = "https://www.imdb.com/search/title?title_type=feature&release_date=2008-01-01,2018-01-01&num_votes=100000,&sort=user_rating,desc"
+my_url = "https://www.imdb.com/title/tt0068646/?pf_rd_m=A2FGELUUNOQJNL&pf_rd_p=e31d89dd-322d-4646-8962-327b42fe94b1&pf_rd_r=AZBNSXYBZR4CBAW1NXYE&pf_rd_s=center-1&pf_rd_t=15506&pf_rd_i=top&ref_=chttp_tt_2"
+
 
 # # opening connections grabbing page
 # uClient = ureq(my_url)
