@@ -61,8 +61,6 @@ if __name__ == "__main__":
     title = text.splitlines()[2]
     title = title.strip()
 
-    print(title)
-
     year = text.splitlines()[3]
     year = year.strip()
     year = year.replace(")", "")
@@ -163,3 +161,12 @@ if __name__ == "__main__":
     votes = votes[0].text
 
     # votes
+
+    print(title)
+    print(year)
+    print(runtime)
+    print(directors)
+    print(writers)
+    print(actors)
+    print(rating)
+    print(votes)
