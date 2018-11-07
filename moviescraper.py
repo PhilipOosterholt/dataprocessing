@@ -45,16 +45,11 @@ def extract_movies(dom):
 
         # grab rating from html
         rating = container.findAll("div",{"class": "inline-block ratings-imdb-rating"})
+        rating = rating[0]['data-value']
 
-        # turning integer into float then back in string to avoid rounding in excel
-        rating = str(float(rating[0]['data-value']))
-
-        # grab year, remove unnessary parts
+        # grab year, strip all the unnessary parts at once (other method is .replace)
         year = container.findAll("span",{"class": "lister-item-year text-muted unbold"})
-        year = year[0].text.replace("(", "")
-        year = year.replace(")", "")
-        year = year.replace("I", "")
-        year = year.replace(" ", "")
+        year = ''.join(i for i in year[0].text if i.isdigit())
 
         # grab runtime, remove unnessary parts
         runtime = container.findAll("span",{"class": "runtime"})
