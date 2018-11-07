@@ -59,8 +59,8 @@ def save_csv(filename, rows):
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow([
-            'title', 'runtime', 'genre(s)', 'director(s)', 'writer(s)',
-            'actor(s)', 'rating(s)', 'number of rating(s)'
+            'title', 'year', 'runtime', 'genre(s)', 'director(s)', 'writer(s)',
+            'actors', 'ratings', 'votes'
         ])
 
         writer.writerows(rows)
@@ -192,221 +192,86 @@ def scrape_movie_page(dom):
         several), actor(s) (semicolon separated if several), rating, number
         of ratings.
     """
-    multiple = False
-    soup = dom
-    page = soup.findAll("div", {"id":"ratingWidget"})
 
-    text = page[0].p.text
-    text = str(text)
-    title = text.splitlines()[2]
-    title = title.strip()
-    print(title)
+    # title
+    title = dom.findAll("div", {"id":"ratingWidget"})
+    text = title[0].p.text
+    title = str(text).splitlines()[2].strip()
 
-    year = text.splitlines()[3]
-    year = year.strip()
-    year = year.replace(")", "")
-    year = year.replace("(", "")
-    print(year)
+    # year
+    year = text.splitlines()[3].strip()
+    year = year.replace(")", "").replace("(", "")
 
-    runtime = soup.select('time')
-    runtime = runtime[1].text
-    print(runtime)    # if digit magic
+    # runtime
+    runtime = dom.select('time')
+    runtime = runtime[0].text.strip()
 
     # genres
-    genre = soup.findAll("div", {"class":"see-more inline canwrap"})
-    genre = genre[1].text
-    genre = genre.split("Genres:")
-    genre = genre[1].split("|")
-
     genres = []
-
+    genre = dom.findAll("div", {"class":"see-more inline canwrap"})
+    genre = genre[1].text.split("Genres:")
+    genre = genre[1].split("|")
     for i in range(len(genre)):
-        lines = genre[i].replace('\xa0', '')
-        lines = lines.replace(" ", '')
-        lines = lines.replace('\n', '')
+        lines = genre[i].replace('\xa0', '').replace(" ", '').replace('\n', '')
         genres.append(lines)
 
-    genres = ';'.join(genres)
-
-    print(genres)
-
-    # credits
-    credits = soup.findAll("div", {"class": "credit_summary_item"})
+    # credits for director, writer and actor credits
+    credits = dom.findAll("div", {"class": "credit_summary_item"})
 
     # directors
     directors = []
-    direct = credits[0]
-<<<<<<< HEAD
-
-    if "Directors" in direct.text:
-=======
-    if "Director" in direct.text:
-        direct = direct.text.split(":")
-        directors[0] = direct[1]
-    else:
->>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
-        multiple = True
-        direct = direct.text.split(":")
+    if "Directors" in credits[0].text:
+        direct = credits[0].text.split("Directors:")
         direct = direct[1].split(",")
-
-<<<<<<< HEAD
         for i in range(len(direct)):
-            temp = direct[i]
-            temp = temp.replace('\n', '')
+            temp = direct[i].replace('\n', '')
             temp = re.sub(r'\([^()]*\)', '', temp)
-            temp = temp.strip()
-            directors.append(temp)
-
+            directors.append(temp.strip())
     else:
-        direct = direct.text.split(":")
-        direct = direct[1].strip()
-        directors.append(direct)
-=======
-    for i in range(len(direct)):
-        temp = direct[i]
-        temp = temp.replace('\n', '')
-        temp = temp.strip()
-        directors.append(temp)
->>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
-
-    if '' in directors:
-        directors.remove('')
-
-    for i in range(len(directors)):
-        directors[i] = re.sub(r'\([^()]*\)', '', directors[i])
-
-    if multiple == True:
-        directors = ';'.join(directors)
-
-<<<<<<< HEAD
-    directors = directors[0]
-
-=======
->>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
-    print(directors)
+        direct = credits[0].text.split(":")
+        directors.append(direct[1].strip())
 
     # writers
-
     writers = []
-    writer = credits[1]
-<<<<<<< HEAD
-
-    if "Writers:" in writer.text:
-        writer = writer.text.split("Writers:")
+    if "Writers:" in credits[1].text:
+        writer = credits[1].text.split("Writers:")
         writer = writer[1].split(",")
-
         for i in range(len(writer)):
-            if "|" in writer[i]:
-                break
-            temp = writer[i]
-            temp = temp.replace('\n', '')
+            if "|" in writer[i]: break
+            temp = writer[i].replace('\n', '')
             temp = re.sub(r'\([^()]*\)', '', temp)
-            temp = temp.strip()
-            writers.append(temp)
+            writers.append(temp.strip())
     else:
-        writer = writer.text.split(":")
-        writer = writer[1].strip()
-        writers.append(writer)
-=======
-    writer = writer.text.split("Writers:")
-    writer = writer[1].split(",")
-
-    for i in range(len(writer)):
-        temp = writer[i]
-        temp = temp.replace('\n', '')
-        temp = temp.strip()
-        writers.append(temp)
->>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
-
-    if '' in writers:
-        writers.remove('')
-
-<<<<<<< HEAD
-=======
-    for i in range(len(writer)):
-        writers[i] = re.sub(r'\([^()]*\)', '', writers[i])
-
->>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
-    writers = ';'.join(writers)
-
-    print(writers)
+        writer = credits[1].text.split(":")
+        writers.append(writer[1].strip())
 
     # actors
     actors = []
-    actor = credits[2]
-    actor = actor.text.split("Stars:")
+    actor = credits[2].text.split("Stars:")
     actor = actor[1].split(",")
-
     for i in range(len(actor)):
-        temp = actor[i]
-        temp = temp.replace('\n', '')
-        temp = temp.strip()
-        if "|" in temp:
-            temp = temp.split(' |', 1)[0]
-        actors.append(temp)
-
-    if '' in actors:
-        actors.remove('')
-
-    for i in range(len(actor)):
-        actors[i] = re.sub(r'\([^()]*\)', '', actors[i])
-
-    actors = ';'.join(actors)
+        temp = actor[i].replace('\n', '')
+        temp = re.sub(r'\([^()]*\)', '', temp)
+        if "|" in temp: temp = temp.split(' |', 1)[0]
+        actors.append(temp.strip())
 
     # rating
-    ratings = soup.findAll("span", {"itemprop": "ratingValue"})
-    rating = ratings[0].text
+    rating = dom.findAll("span", {"itemprop": "ratingValue"})
+    rating = rating[0].text
 
     # votes
-    votes = soup.findAll("span", {"itemprop": "ratingCount"})
+    votes = dom.findAll("span", {"itemprop": "ratingCount"})
     votes = votes[0].text
 
-    return
+    # join everything together
+    genres = ';'.join(genres)
+    directors = ';'.join(directors)
+    writers = ';'.join(writers)
+    actors = ';'.join(actors)
+    information = [title, year, runtime, genres, directors, writers, actors, rating, votes]
 
+    return information
 
 if __name__ == '__main__':
 
     main()
-
-#
-# def scrape_top_250(soup):
-#     """
-#     Scrape the IMDB top 250 movies index page.
-#     Args:
-#         soup: parsed DOM element of the top 250 index page
-#     Returns:
-#         A list of strings, where each string is the URL to a movie's page on
-#         IMDB, note that these URLS must be absolute (i.e. include the http
-#         part, the domain part and the path part).
-#     """
-#     movie_urls = []
-#     # YOUR SCRAPING CODE GOES HERE, ALL YOU ARE LOOKING FOR ARE THE ABSOLUTE
-#     # URLS TO EACH MOVIE'S IMDB PAGE, ADD THOSE TO THE LIST movie_urls.
-#
-#     return movie_urls
-#
-#
-# def scrape_movie_page(dom):
-#     """
-#     Scrape the IMDB page for a single movie
-#     Args:
-#         dom: BeautifulSoup DOM instance representing the page of 1 single
-#             movie.
-#     Returns:
-#         A list of strings representing the following (in order): title, year,
-#         duration, genre(s) (semicolon separated if several), director(s)
-#         (semicolon separated if several), writer(s) (semicolon separated if
-#         several), actor(s) (semicolon separated if several), rating, number
-#         of ratings.
-#     """
-#     # YOUR SCRAPING CODE GOES HERE:
-#     # Return everything of interest for this movie (all strings as specified
-#     # in the docstring of this function).
-#     return
-#
-#
-# if __name__ == '__main__':
-#     main()  # call into the progam
-#
-#     # If you want to test the functions you wrote, you can do that here:
-#     # ...

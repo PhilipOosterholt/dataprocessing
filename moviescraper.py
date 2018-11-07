@@ -103,6 +103,7 @@ def is_good_response(resp):
 
 if __name__ == "__main__":
 
+    # I used 100,000 votes instead of 5,000 so the list contains famous movies
     # get HTML content at target URL
     html = simple_get(TARGET_URL)
 

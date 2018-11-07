@@ -1,72 +1,55 @@
 #!/usr/bin/env python
-# Name:
-# Student number:
+# Name: Philip Oosterholt
+# Student number: 10192263
 """
 This script visualizes data obtained from a .csv file
 """
 
-import csv
 import matplotlib.pyplot as plt
-from collections import defaultdict
 import numpy as np
 import pandas as pd
 
-# Global constants for the input file, first and last year
-INPUT_CSV = "movies.csv"
-START_YEAR = 2008
-END_YEAR = 2018
-
-# Global dictionary for the data
-data_dict = {}
-movies = defaultdict(list)
+# Global constants for the input file
+INPUT = "movies.csv"
+START = 2008
+END = 2018
 
 if __name__ == "__main__":
 
-    years, ratings, y = [], [], []
+    # reading csv file as a pandas DataFrame
+    df = pd.read_csv(INPUT, sep=',', encoding = "ISO-8859-1")
 
-    with open(INPUT_CSV, newline='') as csvfile:
+    # Grouping by year and averaging ratings
+    grouped = df.groupby('year')['rating'].mean()
 
-        reader = csv.DictReader(csvfile)
+    # years in desired range
+    year = list(range(START, END))
 
-        for row in reader:
-            movies[row['year']].append(row['rating'])
+    # initiate plot
+    plot = plt.plot(year, grouped.values)
 
-        # averaging scores per year
-        for year in range(START_YEAR, END_YEAR):
-            year_ratings = np.array(movies[str(year)])
-            year_ratings = year_ratings.astype(np.float)
-            data_dict[str(year)] = round(np.mean(year_ratings), 1)
+    # titles
+    plt.title("Between '08 and '18, 100,000+ votes", style='italic')
+    plt.suptitle("Average Rating of Movies on IMDB", fontsize=14, fontweight='bold')
+    plt.xlabel("Year")
+    plt.ylabel("Rating")
 
-        # create array with all the years
-        x = list(range(START_YEAR, END_YEAR))
+    # linestyle, width and color
+    plt.setp(plot, linestyle='-', linewidth=3, color='r', alpha=0.5)
 
-        # create array with all the mean ratings of said year
-        for i in range(len(x)):
-            y.append(data_dict[str(x[i])])
+    # removing ugly frame lines
+    ax = plt.subplot()
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
 
-        # initiate plot
-        plot = plt.plot(x, y)
+    # moving the labels a bit further a way from the plot
+    ax.xaxis.labelpad = 10
+    ax.yaxis.labelpad = 10
 
-        # titles
-        plt.title("'08 and '18")
-        plt.suptitle("Average Rating of Movies on IMDB", fontsize=14)
-        plt.xlabel("Year")
-        plt.ylabel("Rating")
+    # changing y limits to highlight differences in ratings
+    plt.ylim(8, 8.6)
+    plt.xticks(np.arange(START, END, step=1))
 
-        # linestyle, width and color
-        plt.setp(plot, linestyle='-', linewidth=2, color='r', alpha=0.5)
-
-        # removing ugly frame lines
-        ax = plt.subplot()
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-
-        # moving the labels a bit further a way from the plot
-        ax.xaxis.labelpad = 10
-        ax.yaxis.labelpad = 10
-
-        # setting y limits to emphasize the differences between years
-        plt.ylim(7.7, 8.8)
-
-        # visualize plot
-        plt.show()
+    # I used 100,000 votes instead of 5,000 so the list contains famous movies
+    # visualize plot
+    plt.show()
