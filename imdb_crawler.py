@@ -236,12 +236,20 @@ def scrape_movie_page(dom):
     # directors
     directors = []
     direct = credits[0]
+<<<<<<< HEAD
 
     if "Directors" in direct.text:
+=======
+    if "Director" in direct.text:
+        direct = direct.text.split(":")
+        directors[0] = direct[1]
+    else:
+>>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
         multiple = True
         direct = direct.text.split(":")
         direct = direct[1].split(",")
 
+<<<<<<< HEAD
         for i in range(len(direct)):
             temp = direct[i]
             temp = temp.replace('\n', '')
@@ -253,6 +261,13 @@ def scrape_movie_page(dom):
         direct = direct.text.split(":")
         direct = direct[1].strip()
         directors.append(direct)
+=======
+    for i in range(len(direct)):
+        temp = direct[i]
+        temp = temp.replace('\n', '')
+        temp = temp.strip()
+        directors.append(temp)
+>>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
 
     if '' in directors:
         directors.remove('')
@@ -263,14 +278,18 @@ def scrape_movie_page(dom):
     if multiple == True:
         directors = ';'.join(directors)
 
+<<<<<<< HEAD
     directors = directors[0]
 
+=======
+>>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
     print(directors)
 
     # writers
 
     writers = []
     writer = credits[1]
+<<<<<<< HEAD
 
     if "Writers:" in writer.text:
         writer = writer.text.split("Writers:")
@@ -288,10 +307,26 @@ def scrape_movie_page(dom):
         writer = writer.text.split(":")
         writer = writer[1].strip()
         writers.append(writer)
+=======
+    writer = writer.text.split("Writers:")
+    writer = writer[1].split(",")
+
+    for i in range(len(writer)):
+        temp = writer[i]
+        temp = temp.replace('\n', '')
+        temp = temp.strip()
+        writers.append(temp)
+>>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
 
     if '' in writers:
         writers.remove('')
 
+<<<<<<< HEAD
+=======
+    for i in range(len(writer)):
+        writers[i] = re.sub(r'\([^()]*\)', '', writers[i])
+
+>>>>>>> b69f977cafcfd0e17f643c512f56c6548fac89e7
     writers = ';'.join(writers)
 
     print(writers)
