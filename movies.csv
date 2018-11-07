@@ -1,51 +1,51 @@
-rating;year
-90;2008
-88;2010
-86;2014
-85;2014
-85;2011
-85;2016
-84;2017
-84;2012
-84;2012
-84;2016
-84;2008
-84;2009
-83;2009
-83;2009
-83;2012
-83;2010
-83;2011
-82;2017
-82;2013
-82;2015
-82;2015
-82;2011
-82;2010
-82;2009
-82;2014
-81;2011
-81;2014
-81;2015
-81;2014
-81;2017
-81;2016
-81;2012
-81;2010
-81;2016
-81;2014
-81;2013
-81;2013
-81;2015
-81;2016
-81;2011
-81;2010
-81;2008
-81;2013
-81;2014
-81;2009
-81;2009
-80;2017
-80;2017
-80;2016
-80;2015
+title,rating,year,actors,runtime
+The Dark Knight,9,2008,Christian Bale; Heath Ledger; Aaron Eckhart; Michael Caine,152
+Inception,8.8,2010,Leonardo DiCaprio; Joseph Gordon-Levitt; Ellen Page; Ken Watanabe,148
+Interstellar,8.6,2014,Matthew McConaughey; Anne Hathaway; Jessica Chastain; Mackenzie Foy,169
+Whiplash,8.5,2014,Miles Teller; J.K. Simmons; Melissa Benoist; Paul Reiser,106
+The Intouchables,8.5,2011,François Cluzet; Omar Sy; Anne Le Ny; Audrey Fleurot,112
+Dangal,8.5,2016,Aamir Khan; Sakshi Tanwar; Fatima Sana Shaikh; Sanya Malhotra,161
+Coco,8.4,2017,Anthony Gonzalez; Gael García Bernal; Benjamin Bratt; Alanna Ubach,105
+The Dark Knight Rises,8.4,2012,Christian Bale; Tom Hardy; Anne Hathaway; Gary Oldman,164
+Django Unchained,8.4,2012,Jamie Foxx; Christoph Waltz; Leonardo DiCaprio; Kerry Washington,165
+Kimi no na wa.,8.4,2016,Ryûnosuke Kamiki; Mone Kamishiraishi; Ryô Narita; Aoi Yûki,106
+WALL·E,8.4,2008,Ben Burtt; Elissa Knight; Jeff Garlin; Fred Willard,98
+3 Idiots,8.4,2009,Aamir Khan; Madhavan; Mona Singh; Sharman Joshi,170
+Inglourious Basterds,8.3,2009,Brad Pitt; Diane Kruger; Eli Roth; Mélanie Laurent,153
+Up,8.3,2009,Edward Asner; Jordan Nagai; John Ratzenberger; Christopher Plummer,96
+Jagten,8.3,2012,Mads Mikkelsen; Thomas Bo Larsen; Annika Wedderkopp; Lasse Fogelstrøm,115
+Toy Story 3,8.3,2010,Tom Hanks; Tim Allen; Joan Cusack; Ned Beatty,103
+Jodaeiye Nader az Simin,8.3,2011,Payman Maadi; Leila Hatami; Sareh Bayat; Shahab Hosseini,123
+Three Billboards Outside Ebbing  Missouri,8.2,2017,Frances McDormand; Woody Harrelson; Sam Rockwell; Caleb Landry Jones,115
+The Wolf of Wall Street,8.2,2013,Leonardo DiCaprio; Jonah Hill; Margot Robbie; Matthew McConaughey,180
+Inside Out,8.2,2015,Amy Poehler; Bill Hader; Lewis Black; Mindy Kaling,95
+Room,8.2,2015,Brie Larson; Jacob Tremblay; Sean Bridgers; Wendy Crewson,118
+Warrior,8.2,2011,Tom Hardy; Nick Nolte; Joel Edgerton; Jennifer Morrison,140
+Incendies,8.2,2010,Lubna Azabal; Mélissa Désormeaux-Poulin; Maxim Gaudette; Mustafa Kamel,131
+El secreto de sus ojos,8.2,2009,Ricardo Darín; Soledad Villamil; Pablo Rago; Carla Quevedo,129
+PK,8.2,2014,Aamir Khan; Anushka Sharma; Sanjay Dutt; Boman Irani,153
+Harry Potter and the Deathly Hallows: Part 2,8.1,2011,Daniel Radcliffe; Emma Watson; Rupert Grint; Michael Gambon,130
+Guardians of the Galaxy,8.1,2014,Chris Pratt; Vin Diesel; Bradley Cooper; Zoe Saldana,121
+Mad Max: Fury Road,8.1,2015,Tom Hardy; Charlize Theron; Nicholas Hoult; Zoë Kravitz,120
+Gone Girl,8.1,2014,Ben Affleck; Rosamund Pike; Neil Patrick Harris; Tyler Perry,149
+Logan,8.1,2017,Hugh Jackman; Patrick Stewart; Dafne Keen; Boyd Holbrook,137
+La La Land,8.1,2016,Ryan Gosling; Emma Stone; Rosemarie DeWitt; J.K. Simmons,128
+The Avengers,8.1,2012,Robert Downey Jr.; Chris Evans; Scarlett Johansson; Jeremy Renner,143
+Shutter Island,8.1,2010,Leonardo DiCaprio; Emily Mortimer; Mark Ruffalo; Ben Kingsley,138
+Hacksaw Ridge,8.1,2016,Andrew Garfield; Sam Worthington; Luke Bracey; Teresa Palmer,139
+The Grand Budapest Hotel,8.1,2014,Ralph Fiennes; F. Murray Abraham; Mathieu Amalric; Adrien Brody,99
+Prisoners,8.1,2013,Hugh Jackman; Jake Gyllenhaal; Viola Davis; Melissa Leo,153
+12 Years a Slave,8.1,2013,Chiwetel Ejiofor; Michael Kenneth Williams; Michael Fassbender; Brad Pitt,134
+Spotlight,8.1,2015,Mark Ruffalo; Michael Keaton; Rachel McAdams; Liev Schreiber,129
+Lion,8.1,2016,Dev Patel; Nicole Kidman; Rooney Mara; Sunny Pawar,118
+The Help,8.1,2011,Emma Stone; Viola Davis; Octavia Spencer; Bryce Dallas Howard,146
+Hoe tem je een draak,8.1,2010,Jay Baruchel; Gerard Butler; Christopher Mintz-Plasse; Craig Ferguson,98
+Gran Torino,8.1,2008,Clint Eastwood; Bee Vang; Christopher Carley; Ahney Her,116
+Rush,8.1,2013,Daniel Brühl; Chris Hemsworth; Olivia Wilde; Alexandra Maria Lara,123
+Relatos salvajes,8.1,2014,Darío Grandinetti; María Marull; Mónica Villa; Diego Starosta,122
+Hachi: A Dog's Tale,8.1,2009,Richard Gere; Joan Allen; Cary-Hiroyuki Tagawa; Sarah Roemer,93
+Mary and Max,8.1,2009,Toni Collette; Philip Seymour Hoffman; Eric Bana; Barry Humphries,92
+Call Me by Your Name,8,2017,Armie Hammer; Timothée Chalamet; Michael Stuhlbarg; Amira Casar,132
+Blade Runner 2049,8,2017,Harrison Ford; Ryan Gosling; Ana de Armas; Dave Bautista,164
+Deadpool,8,2016,Ryan Reynolds; Morena Baccarin; T.J. Miller; Ed Skrein,108
+The Revenant,8,2015,Leonardo DiCaprio; Tom Hardy; Will Poulter; Domhnall Gleeson,156
