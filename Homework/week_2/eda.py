@@ -1,3 +1,5 @@
+# Philip Oosterholt 10192263
+
 import pandas as pd
 import numpy as np
 import statistics as stat
@@ -6,29 +8,36 @@ import json
 import plotly as plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
+
 plotly.tools.set_credentials_file(username='Poosterholt', api_key='bzD9L5dwgYn9Zs0eM42J')
 
-
-def stats_country(data):
+def stats_country(data_type):
 
     # calculate mean, median, mode and standard deviation
-    mean = int(df.loc[:, data].mean())
-    median = int(df.loc[:, data].median())
-    mode = stat.mode(df.loc[:, data])
-    std = int(df.loc[:, data].std())
+    mean = int(df.loc[:, data_type].mean())
+    median = int(df.loc[:, data_type].median())
+    mode = stat.mode(df.loc[:, data_type])
+    std = int(df.loc[:, data_type].std())
 
-    print(mean, median, mode, std)
+    print('Mean:', mean)
+    print('Median:', median)
+    print('Mode:', mode)
+    print('Standard deviation:', std)
 
-def five_numbers(data):
+def five_numbers(data_type):
 
     # calculate five numbers summary
-    q1 = df[data].quantile(q=0.25)
-    q3 = df[data].quantile(q=0.75)
-    min = df.loc[:, data].min()
-    max = df.loc[:, data].max()
-    median = df.loc[:, data].median()
+    q1 = df[data_type].quantile(q=0.25)
+    q3 = df[data_type].quantile(q=0.75)
+    min = df.loc[:, data_type].min()
+    max = df.loc[:, data_type].max()
+    median = df.loc[:, data_type].median()
 
-    print(q1, q3, min, max, median)
+    print('Quartile 1:', q1)
+    print('Quartile 3:', q3)
+    print('Minimum:', min)
+    print('Maximum:', max)
+    print('Median:', median)
 
 input = 'input.csv'
 
@@ -74,7 +83,7 @@ ax.spines["right"].set_visible(False)
 
 plt.show()
 
-# convert Infant to float
+# convert Infant and Density to float
 df['Infant'] = (df['Infant'].str.split()).apply(lambda x: float(x[0].replace(',', '.')))
 df['Density'] = (df['Density'].str.split()).apply(lambda x: float(x[0].replace(',', '.')))
 df['Density'] = df.Density.astype(float)
@@ -94,25 +103,29 @@ ax.set_ylabel('Infant mortality per 1000')
 ax.boxplot(box['Infant'])
 plt.show()
 
-# # send data to ploty
-# box = df['Infant']
-#
-# boxplot = go.Box(
-#     y=box,
-#     name='Box Plot'
-# )
-#
-# layout = go.Layout(
-#     title = "Box Plot Infant Mortality",
-#     yaxis=dict(
-#         title='Child Mortality per 1000 births',
-#         zeroline=False
-#     )
-# )
-#
-# data = [boxplot]
-#
-# fig = go.Figure(data=data,layout=layout)
+# ploty plot
+# send data to ploty
+box = df['Infant']
+
+# box plot
+boxplot = go.Box(
+    y=box,
+    name='Box Plot'
+)
+
+# layout plot
+layout = go.Layout(
+    title = "Box Plot Infant Mortality",
+    yaxis=dict(
+        title='Child Mortality per 1000 births',
+        zeroline=False
+    )
+)
+
+data = [boxplot]
+fig = go.Figure(data=data,layout=layout)
+
+# push plot to ploty
 # py.iplot(fig, filename = "Box Plot Data Processing")
 
 # turn DataFrame into json object
@@ -135,15 +148,17 @@ line = X * a + b
 
 # scatter
 scatter = plt.scatter(X, Y, c='blue', alpha=0.3)
-plt.plot(X, line, color='red', linestyle=solid, linewidth=2)
+plt.plot(X, line, color='red', linestyle='-', linewidth=2, alpha=0.9)
 
 # axis
-plt.axis([1.5, 200, 0, 45000])
+plt.axis([0, 200, 0, 45000])
 plt.xticks(np.arange(20, 220, step=20))
 plt.yticks(np.arange(0, 40000, step=5000))
 
 # title
 plt.title('Relation GDP and Infant mortality')
+plt.xlabel('Child Mortality per 1000 Births')
+plt.ylabel('GPD per Capita')
 
 # removing ugly frame lines
 ax = plt.subplot()
