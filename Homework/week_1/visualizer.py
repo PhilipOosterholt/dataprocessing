@@ -47,7 +47,7 @@ if __name__ == "__main__":
     ax.yaxis.labelpad = 10
 
     # changing y limits to highlight differences in ratings
-    plt.ylim(8, 8.6)
+    plt.ylim(1, 10)
     plt.xticks(np.arange(START, END, step=1))
 
     # I used 100,000 votes instead of 5,000 so the list contains famous movies

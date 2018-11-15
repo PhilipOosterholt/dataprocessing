@@ -12,7 +12,7 @@ from contextlib import closing
 from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen as ureq
 
-TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_date=2008-01-01,2018-01-01&num_votes=100000,&sort=user_rating,desc"
+TARGET_URL = "https://www.imdb.com/search/title?title_type=feature&release_date=2008-01-01,2018-01-01&num_votes=5000,&sort=user_rating,desc"
 BACKUP_HTML = 'movies.html'
 OUTPUT_CSV = 'movies.csv'
 
@@ -59,11 +59,14 @@ def extract_movies(dom):
         actors = container.findAll("p",{"class", ""})
         actors = actors[1].text.split("Stars:")
 
-        # if the movie has actors/directors - could happen in small unkown movies
         if len(actors) > 1:
             # put string into 1 line, replace comma's with ; for csv
             actors = actors[1].replace("\n", "")
             actors = actors.replace(",", ";")
+
+        # catch situations where the actors of the movie are unkown or not present
+        if actors == ['\n']:
+            actors = 'Unkown/no actors'
 
         # write to csv file
         f.write(title.replace(",", " ") + "," + rating + "," + year + "," + actors + "," + runtime + "\n")
