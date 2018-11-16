@@ -65,7 +65,8 @@ def extract_movies(dom):
             actors = actors.replace(",", ";")
 
         # catch situations where the actors of the movie are unkown or not present
-        if actors == ['\n']:
+        actors = actors[0].strip()
+        if actors == '':
             actors = 'Unkown/no actors'
 
         # write to csv file
