@@ -27,6 +27,43 @@
     }
   }
 
+  function get_data(data, column){
+    var new_data = [];
+    for (var i = 0; i < Object.values(data).length; i++){
+      new_data[i] = Object.values(data)[i][column];
+    }
+    return new_data
+  }
+
+  function get_linear_data(data, linear){
+    var new_data = [];
+    for (var i = 0; i < data.length; i++) {
+      new_data[i] = Math.round(linear(data[i]));
+    }
+    return new_data
+  }
+
+  function draw_line(data, ctx, position_x, width, color){
+
+    previous_year = data[0];
+    move = (width - position_x) / data.length;
+
+    // draw line
+    for(year in data) {
+      year = data[year];
+
+    ctx.beginPath();
+    ctx.moveTo(position_x, previous_year);
+    ctx.lineTo(position_x + move, year);
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = color;
+    ctx.stroke();
+    previous_year = year;
+    position_x += move;
+    }
+  }
+
   var fileName = "data.json";
   var txtFile = new XMLHttpRequest();
   txtFile.open("GET", fileName);
@@ -42,93 +79,36 @@
 
   function my_plot(data) {
 
-  var bevolking = [];
-  for (var i = 0; i < 118; i++){
-    bevolking[i] = Object.values(data)[i]['Bevolking'];
-  }
-
-  var jaar = [];
-  for (var i = 0; i < 118; i++){
-    jaar[i] = Object.values(data)[i]['Jaar'];
-  }
-
-  var old_people = [];
-  for (var i = 0; i < 118; i++){
-    old_people[i] = Object.values(data)[i]['Bejaarden'];
-  }
+  bevolking = get_data(data, 'Bevolking');
+  jaar = get_data(data, 'Jaar');
+  old_people = get_data(data, 'Bejaarden');
 
   var canvas = document.getElementById('Canvas'); // in your HTML this element appears as <canvas id="myCanvas"></canvas>
   var ctx = canvas.getContext('2d');
-  var width = canvas.width = 800;
+  var width = canvas.width = 1000;
   var height = canvas.height = 600;
 
   ctx.font = "20px Arial";
   ctx.fillText("Bevolkingsgroei 1900-2017", 100, 30);
-
   ctx.font = "12px Arial";
   ctx.fillText("CBS, 2018", 100, 50);
-
   ctx.translate(0, height);
   ctx.scale(1, -1);
 
-  width = width - 20;
+  width = 800;
   var position_x = 100;
 
+  // obtain linear functions
   linear = createTransform([0,17082], [50, height - position_x]);
   linear_year = createTransform([1900,2017], [position_x, width]);
 
-  var population = [];
-  var date = [];
-  var old = []
+  // obtain data coordinates
+  population = get_linear_data(bevolking, linear);
+  date = get_linear_data(jaar, linear_year);
+  old = get_linear_data(old_people, linear);
 
-  for (var i = 0; i < bevolking.length; i++) {
-    population[i] = Math.round(linear(bevolking[i]));
-  }
-
-  for (var i = 0; i < bevolking.length; i++) {
-    date[i] = Math.round(linear_year(jaar[i]));
-  }
-
-  for (var i = 0; i < bevolking.length; i++) {
-    old[i] = Math.round(linear(old_people[i]));
-  }
-
-  previous_year = population[0];
-  move = (width - position_x) / bevolking.length;
-
-  // draw line
-  for(year in population) {
-    year = population[year];
-
-  ctx.beginPath();
-  ctx.moveTo(position_x, previous_year);
-  ctx.lineTo(position_x + move, year);
-  ctx.lineWidth = 2.5;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-
-  previous_year = year;
-  position_x += move;
-  }
-
-  var position_x = 100;
-
-  // draw line
-  for(year in old) {
-    year = old[year];
-
-  ctx.beginPath();
-  ctx.moveTo(position_x, previous_year);
-  ctx.lineTo(position_x + move, year);
-  ctx.lineWidth = 2.5;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-
-  previous_year = year;
-  position_x += move;
-  }
-
-  var position_x = 100;
+  draw_line(population, ctx, 100, width, '#000000')
+  draw_line(old, ctx, 100, width, '#ff0000')
 
   // draw y axis
   ctx.beginPath();
@@ -136,6 +116,7 @@
   ctx.lineTo(position_x, height - 70);
   ctx.lineWidth = 5;
   ctx.lineCap = 'round';
+  ctx.strokeStyle = '#000000';
   ctx.stroke();
 
   // draw x-axis line
