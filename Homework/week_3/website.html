@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="Canvas"></canvas>
+<script>
+
+  function createTransform(domain, range){
+	// domain is a two-element array of the data bounds [domain_min, domain_max]
+	// range is a two-element array of the screen bounds [range_min, range_max]
+	// this gives you two equations to solve:
+	// range_min = alpha * domain_min + beta
+	// range_max = alpha * domain_max + beta
+ 		// a solution would be:
+
+    var domain_min = domain[0]
+    var domain_max = domain[1]
+    var range_min = range[0]
+    var range_max = range[1]
+
+    // formulas to calculate the alpha and the beta
+   	var alpha = (range_max - range_min) / (domain_max - domain_min)
+    var beta = range_max - alpha * domain_max
+
+    // returns the function for the linear transformation (y= a * x + b)
+    return function(x){
+      return alpha * x + beta;
+    }
+  }
+
+  var fileName = "data.json";
+  var txtFile = new XMLHttpRequest();
+  txtFile.open("GET", fileName);
+  txtFile.onreadystatechange = function() {
+      if (txtFile.readyState === 4 && txtFile.status == 200) {
+          var data = JSON.parse(txtFile.responseText);
+          my_plot(data);
+          console.log(data)
+      }
+    }
+
+  txtFile.send();
+
+  function my_plot(data) {
+
+  var bevolking = [];
+  for (var i = 0; i < 118; i++){
+    bevolking[i] = Object.values(data)[i]['Bevolking'];
+  }
+
+  var jaar = [];
+  for (var i = 0; i < 118; i++){
+    jaar[i] = Object.values(data)[i]['Jaar'];
+  }
+
+  var old_people = [];
+  for (var i = 0; i < 118; i++){
+    old_people[i] = Object.values(data)[i]['Tachtig'];
+  }
+
+  var canvas = document.getElementById('Canvas'); // in your HTML this element appears as <canvas id="myCanvas"></canvas>
+  var ctx = canvas.getContext('2d');
+  var width = canvas.width = 800;
+  var height = canvas.height = 600;
+
+  ctx.font = "20px Arial";
+  ctx.fillText("Bevolkingsgroei 1900-2017", 100, 30);
+
+  ctx.font = "12px Arial";
+  ctx.fillText("CBS, 2018", 100, 50);
+
+  ctx.translate(0, height);
+  ctx.scale(1, -1);
+
+  width = width - 20;
+  var position_x = 100;
+
+  linear = createTransform([0,17082], [50, height - position_x]);
+  linear_year = createTransform([1900,2017], [position_x, width]);
+
+  var population = [];
+  var date = [];
+  var old = []
+
+  for (var i = 0; i < bevolking.length; i++) {
+    population[i] = Math.round(linear(bevolking[i]));
+  }
+
+  for (var i = 0; i < bevolking.length; i++) {
+    date[i] = Math.round(linear_year(jaar[i]));
+  }
+
+  for (var i = 0; i < bevolking.length; i++) {
+    old[i] = Math.round(linear(old_people[i]));
+  }
+
+  previous_year = population[0];
+  move = (width - position_x) / bevolking.length;
+
+  // draw line
+  for(year in population) {
+    year = population[year];
+
+  ctx.beginPath();
+  ctx.moveTo(position_x, previous_year);
+  ctx.lineTo(position_x + move, year);
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  previous_year = year;
+  position_x += move;
+  }
+
+  var position_x = 100;
+
+  // draw line
+  for(year in old) {
+    year = old[year];
+
+  ctx.beginPath();
+  ctx.moveTo(position_x, previous_year);
+  ctx.lineTo(position_x + move, year);
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  previous_year = year;
+  position_x += move;
+  }
+
+  var position_x = 100;
+
+  // draw y axis
+  ctx.beginPath();
+  ctx.moveTo(position_x, 50);
+  ctx.lineTo(position_x, height - 70);
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // draw x-axis line
+  ctx.beginPath();
+  ctx.moveTo(100, 50);
+  ctx.lineTo(width + 13, 50);
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  // y-axis
+  var yaxis = [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000]
+  linear_million = createTransform([0,17082], [50, height - position_x]);
+
+  var million = [];
+  for (var i = 0; i < 9; i++) {
+    million[i] = Math.round(linear_million(yaxis[i]));
+  }
+
+  ctx.translate(50, height);
+  ctx.scale(1, -1);
+  ctx.font = "12px Arial";
+  begin = 1910;
+  offset = 15;
+
+  // x-axis
+  for (var i = 0; i < 12; i++) {
+
+    ctx.fillText((begin + 10 * i), date[i*10] - offset, 575);
+
+    ctx.beginPath();
+    ctx.moveTo(date[i*10], 543);
+    ctx.lineTo(date[i*10], 547);
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(date[i*10], 74);
+    ctx.lineTo(date[i*10], 547);
+    ctx.lineWidth = 0.5;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+
+  for (var i = 0; i < 9; i++) {
+
+    ctx.fillText((2 + i * 2) + " miljoen", - 25, height - million[i]);
+
+    ctx.beginPath();
+    ctx.moveTo(53, height - million[i]);
+    ctx.lineTo(57, height - million[i]);
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(53, height - million[i]);
+    ctx.lineTo(width - 40, height - million[i]);
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+}
+</script>
