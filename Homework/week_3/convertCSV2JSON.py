@@ -4,7 +4,7 @@ input = 'dataset.csv'
 
 # reading and renaming data
 df = pd.read_csv(input, sep=';', index_col='ID', usecols=['ID', 'Perioden', 'TotaalBevolking_4', 'k_80JaarOfOuder_9'])
-df = df.rename(columns={'Perioden': 'Jaar', 'TotaalBevolking_4': 'Bevolking', 'k_80JaarOfOuder_9': 'Tachtig'})
+df = df.rename(columns={'Perioden': 'Jaar', 'TotaalBevolking_4': 'Bevolking', 'k_65Tot80Jaar_8': 'Bejaarden'})
 
 # cleaning data
 df = df.dropna()
