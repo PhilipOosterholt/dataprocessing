@@ -1,3 +1,5 @@
+  // Philip Oosterholt - 10192263
+  // Late wildcard
 
   function createTransform(domain, range){
 	// domain is a two-element array of the data bounds [domain_min, domain_max]
@@ -7,14 +9,14 @@
 	// range_max = alpha * domain_max + beta
  		// a solution would be:
 
-    var domain_min = domain[0]
-    var domain_max = domain[1]
-    var range_min = range[0]
-    var range_max = range[1]
+    var domain_min = domain[0];
+    var domain_max = domain[1];
+    var range_min = range[0];
+    var range_max = range[1];
 
     // formulas to calculate the alpha and the beta
-   	var alpha = (range_max - range_min) / (domain_max - domain_min)
-    var beta = range_max - alpha * domain_max
+   	var alpha = (range_max - range_min) / (domain_max - domain_min);
+    var beta = range_max - alpha * domain_max;
 
     // returns the function for the linear transformation (y= a * x + b)
     return function(x){
@@ -103,20 +105,20 @@
   }
 
   // Function to draw x-markers on the x-axis
-  function x_markers(ctx, data, offset) {
+  function x_markers(ctx, data, y_begin) {
     ctx.beginPath();
-    ctx.moveTo(data, offset);
-    ctx.lineTo(data, offset + 4);
+    ctx.moveTo(data, y_begin);
+    ctx.lineTo(data, y_begin + 4);
     ctx.lineWidth = 3;
     ctx.lineCap = 'round';
     ctx.stroke();
   }
 
   // Function to draw y-markers on the y-axis
-  function y_markers(ctx, data, height, offset) {
+  function y_markers(ctx, data, height, x_begin) {
     ctx.beginPath();
-    ctx.moveTo(offset, height - data);
-    ctx.lineTo(offset + 4, height - data);
+    ctx.moveTo(x_begin, height - data);
+    ctx.lineTo(x_begin + 4, height - data);
     ctx.lineWidth = 3;
     ctx.stroke();
   }
@@ -154,7 +156,7 @@
   oldest = get_data(data, 'k_80JaarOfOuder_9')
   year = get_data(data, 'Perioden');
 
-  var yaxis = [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000]
+  var yaxis = [2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000];
 
   // canvas
   var canvas = document.getElementById('Canvas'); // in your HTML this element appears as <canvas id="myCanvas"></canvas>
@@ -185,7 +187,7 @@
   // obtain data coordinates
   population = get_linear_data(population, linear);
   twenty = get_linear_data(twenty, linear);
-  fourtyfive = get_linear_data(fourtyfive, linear)
+  fourtyfive = get_linear_data(fourtyfive, linear);
   sixtyfive = get_linear_data(sixtyfive, linear);
   eigthy = get_linear_data(eigthy, linear);
   oldest = get_linear_data(oldest, linear);
@@ -214,22 +216,22 @@
   var x_label_offset = 15;
   for (var i = 0; i < year.length; i++) {
     ctx.fillText((begin + 10 * i), year[i*10] - x_label_offset, 575);
-    x_markers(ctx, year[i*10], 543)
+    x_markers(ctx, year[i*10], 543);
     x_grid(ctx, year[i*10], 76, 550);
   }
 
   // y-axis
   var y_label = 'miljoen';
-  var y_label_offset = 25
+  var y_label_offset = 25;
   for (var i = 0; i < million.length; i++) {
     ctx.fillText((2 + i * 2) + ' ' + y_label, - y_label_offset, height - million[i]);
-    y_markers(ctx, million[i], height, 53)
-    y_grid(ctx, million[i], height, width - 1, 50)
+    y_markers(ctx, million[i], height, 53);
+    y_grid(ctx, million[i], height, width - 1, 50);
   }
 
   // legend
-  names = ['Totaal', '0-20 jaar', '20-45 jaar', '45 - 65 jaar', '65 - 80 jaar', '80+ jaar']
-  color = ['#000000', '#00008b', '#008000', '#ff0000', '#ff8c00', '#8b008b']
+  names = ['Totaal', '0-20 jaar', '20-45 jaar', '45-65 jaar', '65-80 jaar', '80+ jaar'];
+  color = ['#000000', '#00008b', '#008000', '#ff0000', '#ff8c00', '#8b008b'];
 
   for (var i = 0; i < names.length; i++){
     ctx.fillText(names[i], 865, 119 + i * 20);
