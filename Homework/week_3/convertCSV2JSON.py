@@ -3,12 +3,11 @@ import pandas as pd
 input = 'dataset.csv'
 
 # reading and renaming data
-df = pd.read_csv(input, sep=';', index_col='ID', usecols=['ID', 'Perioden', 'TotaalBevolking_4', 'k_65Tot80Jaar_8'])
-df = df.rename(columns={'Perioden': 'Jaar', 'TotaalBevolking_4': 'Bevolking', 'k_65Tot80Jaar_8': 'Bejaarden'})
+df = pd.read_csv(input, sep=';', usecols=['Perioden', 'TotaalBevolking_4', 'k_0Tot20Jaar_5', 'k_20Tot45Jaar_6', 'k_45Tot65Jaar_7', 'k_65Tot80Jaar_8',  'k_80JaarOfOuder_9'])
 
 # cleaning data
 df = df.dropna()
-df['Jaar'] = df['Jaar'].str.replace('JJ00', '')
+df['Perioden'] = df['Perioden'].str.replace('JJ00', '')
 
 # turn DataFrame into json object
 data = df.to_json(orient='index')
