@@ -87,20 +87,20 @@
 
   // Function to draw x part of the grid
   function x_grid(ctx, data, begin, end) {
+    ctx.lineWidth = 0.5;
+    ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.moveTo(data, begin);
     ctx.lineTo(data, end);
-    ctx.lineWidth = 0.5;
-    ctx.lineCap = 'round';
     ctx.stroke();
   }
 
   // Function to draw y part of the grid
   function y_grid(ctx, data, height, width, offset) {
+    ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(offset, height - data);
     ctx.lineTo(width - 40, height - data);
-    ctx.lineWidth = 0.5;
     ctx.stroke();
   }
 
@@ -175,7 +175,7 @@
   ctx.font = "12px Verdana";
   ctx.fillText("CBS, 2018", position_x, 50);
 
-  // orientate graph
+  // positioning the graph
   ctx.translate(0, height);
   ctx.scale(1, -1);
 
@@ -206,9 +206,15 @@
   draw_xaxis(ctx, position_x, position_y, width, 13)
   draw_yaxis(ctx, position_x, position_y, height, 70)
 
-  // orientate graph
+  // positioning the graph
   ctx.translate(50, height);
   ctx.scale(1, -1);
+
+  // draw rectangle for legend
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#000000';
+  ctx.rect(790,100,155,133);
+  ctx.stroke();
 
   // x-axis
   ctx.font = "12px Verdana";
@@ -237,10 +243,4 @@
     ctx.fillText(names[i], 865, 119 + i * 20);
     draw_simple(ctx, 800, 115 + i * 20, 8, color[i]);
   }
-
-  // rectangle for legend
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = '#000000';
-  ctx.rect(790,100,155,133);
-  ctx.stroke();
 }
