@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,200i,300,300i,400,400i,500,500i,700,700i" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="d3/d3.js"></script>
+  </head>
+  <body>
+    <script>
+
+      d3.select("head")
+        .append("title")
+        .text("My bargraph!");
+
+      d3.select("body")
+        .append("h1")
+        .text("Worldwide energy productie by source")
+
+      d3.select("body")
+        .append("h3")
+        .text("Created by Philip Oosterholt, student number 10192263")
+
+      var fileName = "data.json";
+      var txtFile = new XMLHttpRequest();
+      txtFile.open("GET", fileName);
+      txtFile.onreadystatechange = function() {
+          if (txtFile.readyState === 4 && txtFile.status == 200) {
+              var data = JSON.parse(txtFile.responseText);
+              barchart(data);
+          }
+        }
+
+      txtFile.send();
+
+      function barchart(data) {
+
+      //Width and height
+      var w = 1000;
+      var h = 600;
+      var padding = 20;
+
+      var keys = Object.keys(data[0]);
+      var values = Object.values(data[5])
+      keys.shift();
+      values.shift();
+
+      //Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h)
+            .append("g")
+            .attr("transform", "translate(25,0)");
+
+      max_range = 50
+      padding_top = 25
+
+      w -= 100
+      h -= 100
+
+      var yScale = d3.scaleLinear()
+                     .domain([0, max_range])
+                     .range([0, h - padding_top]);
+
+      var yAxis = d3.scaleLinear()
+                      .domain([max_range, 0])
+                      .range([padding_top, h]);
+
+
+
+
+      svg.selectAll("rect")
+
+         .data(values) // dataset
+         .enter()
+         .append("rect") // append * dataset rectangles
+         .attr("width", (w / values.length) - padding)
+         .attr("x", function functie(d, i) {
+            return i * (w / values.length) + 20;
+          })
+         .attr("y", function functie(d) {
+           return h - yScale(d);
+         })
+         .attr("height", function functie(d) {
+           return yScale(d);
+         })
+         .attr("fill", "teal");
+
+         svg.selectAll("text")
+
+            .data(values)
+            .enter()
+            .append("text")
+            .text(function functie(d) {
+               return d + ' %';
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function functie(d, i) {
+               return  i * (w / values.length) + max_range + 25;
+            })
+            .attr("y", h - 3.5)
+            .attr('font-family', 'Montserrat', 'sans-serif')
+            .attr("font-size", "12px")
+            .attr("font-weight", '500')
+            .attr("fill", "white");
+
+            svg.append("g")
+                 .attr("class", "y axis")
+                 .call(d3.axisLeft(yAxis));
+
+
+      }
+
+
+
+
+
+
+    </script>
+  </body>
+</html>
