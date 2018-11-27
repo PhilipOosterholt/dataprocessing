@@ -14,13 +14,13 @@
 
       d3.select("body")
         .append("h1")
-        .text("Worldwide energy productie by source")
+        .text("Worldwide energy production by source")
 
       d3.select("body")
         .append("h3")
         .text("Created by Philip Oosterholt, student number 10192263")
 
-      var fileName = "data.json";
+      var fileName = "dataset.json";
       var txtFile = new XMLHttpRequest();
       txtFile.open("GET", fileName);
       txtFile.onreadystatechange = function() {
@@ -38,9 +38,9 @@
       var w = 1000;
       var h = 600;
       var padding = 20;
-
       var keys = Object.keys(data[0]);
       var values = Object.values(data[5])
+
       keys.shift();
       values.shift();
 
@@ -59,24 +59,23 @@
       h -= 100
 
       var yScale = d3.scaleLinear()
-                     .domain([0, max_range])
-                     .range([0, h - padding_top]);
+          .domain([0, max_range])
+          .range([0, h - padding_top]);
 
       var yAxis = d3.scaleLinear()
-                      .domain([max_range, 0])
-                      .range([padding_top, h]);
+          .domain([max_range, 0])
+          .range([padding_top, h]);
 
+      var xScale = d3.scaleLinear()
+        	.range([0, w]);
 
-
-
-      svg.selectAll("rect")
-
+      svg.selectAll("#bar")
          .data(values) // dataset
          .enter()
          .append("rect") // append * dataset rectangles
          .attr("width", (w / values.length) - padding)
          .attr("x", function functie(d, i) {
-            return i * (w / values.length) + 20;
+            return i * (w / values.length) + padding;
           })
          .attr("y", function functie(d) {
            return h - yScale(d);
@@ -86,30 +85,45 @@
          })
          .attr("fill", "teal");
 
-         svg.selectAll("text")
+     svg.selectAll('#text')
+        .data(values)
+        .enter()
+        .append("text")
+        .text(function functie(d) {
+           return d + ' %';
+        })
+        .attr("x", function functie(d, i) {
+           return  i * (w / values.length) + max_range + 25;
+        })
+        .attr("y", h - 3.5)
+        .attr("text-anchor", "middle")
+        .attr('font-family', 'Montserrat', 'sans-serif')
+        .attr("font-size", "12px")
+        .attr("font-weight", '500')
+        .attr("fill", "white");
 
-            .data(values)
-            .enter()
-            .append("text")
-            .text(function functie(d) {
-               return d + ' %';
-            })
-            .attr("text-anchor", "middle")
-            .attr("x", function functie(d, i) {
-               return  i * (w / values.length) + max_range + 25;
-            })
-            .attr("y", h - 3.5)
-            .attr('font-family', 'Montserrat', 'sans-serif')
-            .attr("font-size", "12px")
-            .attr("font-weight", '500')
-            .attr("fill", "white");
+    svg.selectAll('#source')
+        .select('text')
+      	.data(keys)
+      	.enter()
+      	.append('text')
+        .attr("text-anchor", "middle")
+        .attr("x", function functie(d, i) {
+           return  i * (w / values.length) + max_range + 25;
+        })
+        .attr("y", h + 25)
+      	.text(function(d) {
+      		return d;
+      	})
+        .attr('font-family', 'Montserrat', 'sans-serif')
+        .attr("font-size", "18px")
+        .attr("font-weight", '400')
+        .attr("fill", "black");
 
-            svg.append("g")
-                 .attr("class", "y axis")
-                 .call(d3.axisLeft(yAxis));
-
-
-      }
+    svg.append("g")
+       .attr("class", "y axis")
+       .call(d3.axisLeft(yAxis));
+    }
 
 
 
