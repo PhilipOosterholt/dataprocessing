@@ -123,7 +123,6 @@
         })
         // scalable text for bars
         .attr("x", function (d, i) {
-          console.log(i * (w / values.length) + ((w / values.length + padding) / 2))
            return  i * (w / values.length) + ((w / values.length + padding) / 2);
         })
         .attr("y", h - 3.5);
