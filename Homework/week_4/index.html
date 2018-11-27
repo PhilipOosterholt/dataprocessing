@@ -8,18 +8,21 @@
   <body>
     <script>
 
+      // title in browser
       d3.select("head")
         .append("title")
         .text("My bargraph!");
 
+      // title, name, description
       d3.select("body")
         .append("h1")
-        .text("Worldwide energy production by source")
-
-      d3.select("body")
+        .text("Worldwide energy production by source in 2015")
         .append("h3")
         .text("Created by Philip Oosterholt, student number 10192263")
+        .append("h5")
+        .text("Total energy production Worldwide by source, hover over the bars to see the 2010 data");
 
+      // load json file
       var fileName = "dataset.json";
       var txtFile = new XMLHttpRequest();
       txtFile.open("GET", fileName);
@@ -32,103 +35,126 @@
 
       txtFile.send();
 
+      // bar chart function
       function barchart(data) {
 
-      //Width and height
-      var w = 1000;
-      var h = 600;
-      var padding = 20;
+      // load data
       var keys = Object.keys(data[0]);
       var values = Object.values(data[5])
+      var val_2010 = Object.values(data[4])
 
+      // remove first entry (year)
       keys.shift();
       values.shift();
+      val_2010.shift();
 
-      //Create SVG element
+      // margins
+      var margin = {top: 25, right: 50, bottom: 25, left: 25};
+      var padding = 20;
+      w = 1000 - margin.left - margin.right;
+      h = 550 - margin.top - margin.bottom;
+
+      // svg element
 			var svg = d3.select("body")
 						.append("svg")
-						.attr("width", w)
-						.attr("height", h)
+						.attr("width", w + margin.left + margin.right)
+						.attr("height", h + margin.top + margin.bottom)
             .append("g")
-            .attr("transform", "translate(25,0)");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ')');
 
+      // defines the end of range in %
       max_range = 50
-      padding_top = 25
 
-      w -= 100
-      h -= 100
-
+      // y linear scale for data
       var yScale = d3.scaleLinear()
           .domain([0, max_range])
-          .range([0, h - padding_top]);
+          .range([0, h]);
 
+      // y linear scale for axis
       var yAxis = d3.scaleLinear()
           .domain([max_range, 0])
-          .range([padding_top, h]);
+          .range([0, h]);
 
-      var xScale = d3.scaleLinear()
-        	.range([0, w]);
+      // tooltip adapated from Michael Stanaland’s bar bargraph
+      // see http://bl.ocks.org/mstanaland/6100713 for code
+      var tooltip = svg.append("g")
+        .attr("class", "tooltip")
+        .style("display", "none");
 
-      svg.selectAll("#bar")
+      // tooltip text
+      tooltip.append("text")
+        .attr("x", 40)
+
+      // create bars
+      svg.selectAll(".bar")
          .data(values) // dataset
          .enter()
          .append("rect") // append * dataset rectangles
+         .attr("class", "bar")
          .attr("width", (w / values.length) - padding)
-         .attr("x", function functie(d, i) {
+         .attr("x", function(d, i) {
             return i * (w / values.length) + padding;
           })
-         .attr("y", function functie(d) {
+         .attr("y", function(d) {
            return h - yScale(d);
          })
-         .attr("height", function functie(d) {
+         .attr("height", function(d) {
            return yScale(d);
          })
-         .attr("fill", "teal");
+         .attr("fill", "#006622")
+         // tooltip
+         .on("mouseover", function() { tooltip.style("display", null); })
+         .on("mouseout", function() { tooltip.style("display", "none"); })
+         .on("mousemove", function(d, i) {
+           xPos = i * (w / values.length);
+           yPos = h - yScale(d) - 10;
+           tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
+           tooltip.select("text").text('2010: ' + val_2010[i] + '%');
+         })
 
+     // text for bars
      svg.selectAll('#text')
         .data(values)
         .enter()
         .append("text")
-        .text(function functie(d) {
+        .text(function (d) {
            return d + ' %';
         })
-        .attr("x", function functie(d, i) {
+        .attr("x", function (d, i) {
            return  i * (w / values.length) + max_range + 25;
         })
         .attr("y", h - 3.5)
         .attr("text-anchor", "middle")
-        .attr('font-family', 'Montserrat', 'sans-serif')
-        .attr("font-size", "12px")
-        .attr("font-weight", '500')
         .attr("fill", "white");
 
-    svg.selectAll('#source')
+    // names bars
+    svg.selectAll('.source')
         .select('text')
       	.data(keys)
       	.enter()
       	.append('text')
         .attr("text-anchor", "middle")
-        .attr("x", function functie(d, i) {
+        .attr("x", function (d, i) {
            return  i * (w / values.length) + max_range + 25;
         })
         .attr("y", h + 25)
       	.text(function(d) {
       		return d;
       	})
-        .attr('font-family', 'Montserrat', 'sans-serif')
-        .attr("font-size", "18px")
-        .attr("font-weight", '400')
-        .attr("fill", "black");
 
     svg.append("g")
        .attr("class", "y axis")
        .call(d3.axisLeft(yAxis));
+
+    // x-axis line
+    svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", h)
+      .attr("x2", w)
+      .attr("y2", h)
+      .attr("stroke-width", 2)
+      .attr("stroke", "black");
     }
-
-
-
-
-
 
     </script>
   </body>
