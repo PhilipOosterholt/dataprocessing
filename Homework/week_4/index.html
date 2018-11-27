@@ -11,7 +11,7 @@
       // title in browser
       d3.select("head")
         .append("title")
-        .text("My bargraph!");
+        .text("My bargraph");
 
       // title, name, description
       d3.select("body")
@@ -20,8 +20,7 @@
         .append("h3")
         .text("Created by Philip Oosterholt, student number 10192263")
         .append("h5")
-        .text("Total energy production Worldwide by source, hover over the bars to see the 2010 data");
-
+        .text("Total energy production worldwide by source, hover over the bars to see the 2010 data. Source: Enerdata, 2018");
       // load json file
       var fileName = "dataset.json";
       var txtFile = new XMLHttpRequest();
@@ -49,18 +48,18 @@
       val_2010.shift();
 
       // margins
-      var margin = {top: 25, right: 50, bottom: 25, left: 25};
+      var margin = {top: 25, right: 50, bottom: 75, left: 50};
       var padding = 20;
-      w = 1000 - margin.left - margin.right;
-      h = 550 - margin.top - margin.bottom;
+      w = 800 - margin.left - margin.right;
+      h = 600 - margin.top - margin.bottom;
 
       // svg element
 			var svg = d3.select("body")
-						.append("svg")
-						.attr("width", w + margin.left + margin.right)
-						.attr("height", h + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ')');
+					.append("svg")
+					.attr("width", w + margin.left + margin.right)
+					.attr("height", h + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ')');
 
       // defines the end of range in %
       max_range = 50
@@ -78,12 +77,12 @@
       // tooltip adapated from Michael Stanaland’s bar bargraph
       // see http://bl.ocks.org/mstanaland/6100713 for code
       var tooltip = svg.append("g")
-        .attr("class", "tooltip")
-        .style("display", "none");
+          .attr("class", "tooltip")
+          .style("display", "none");
 
       // tooltip text
       tooltip.append("text")
-        .attr("x", 40)
+          .attr("text-anchor", "middle")
 
       // create bars
       svg.selectAll(".bar")
@@ -106,7 +105,7 @@
          .on("mouseover", function() { tooltip.style("display", null); })
          .on("mouseout", function() { tooltip.style("display", "none"); })
          .on("mousemove", function(d, i) {
-           xPos = i * (w / values.length);
+           xPos = i * (w / values.length) + ((w / values.length + padding) / 2);
            yPos = h - yScale(d) - 10;
            tooltip.attr("transform", "translate(" + xPos + "," + yPos + ")");
            tooltip.select("text").text('2010: ' + val_2010[i] + '%');
@@ -117,15 +116,17 @@
         .data(values)
         .enter()
         .append("text")
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
         .text(function (d) {
            return d + ' %';
         })
+        // scalable text for bars
         .attr("x", function (d, i) {
-           return  i * (w / values.length) + max_range + 25;
+          console.log(i * (w / values.length) + ((w / values.length + padding) / 2))
+           return  i * (w / values.length) + ((w / values.length + padding) / 2);
         })
-        .attr("y", h - 3.5)
-        .attr("text-anchor", "middle")
-        .attr("fill", "white");
+        .attr("y", h - 3.5);
 
     // names bars
     svg.selectAll('.source')
@@ -134,17 +135,29 @@
       	.enter()
       	.append('text')
         .attr("text-anchor", "middle")
+        // scalable text for bars
         .attr("x", function (d, i) {
-           return  i * (w / values.length) + max_range + 25;
+           return  i * (w / values.length) + ((w / values.length + padding) / 2);
         })
         .attr("y", h + 25)
       	.text(function(d) {
       		return d;
       	})
 
+    // y-axis
     svg.append("g")
        .attr("class", "y axis")
        .call(d3.axisLeft(yAxis));
+
+   // y-axis title
+   svg.append("text")
+       .attr("y", margin.left * -.75) // make sure it doesn't use all the margin
+       .attr("x", (h / -2)) // half of the height
+       .attr("transform", "rotate(-90)")
+       .style("text-anchor", "middle")
+       .style("font-size", "15px")
+       .style("font-weight", "500")
+       .text('% of total production');
 
     // x-axis line
     svg.append("line")
@@ -154,7 +167,28 @@
       .attr("y2", h)
       .attr("stroke-width", 2)
       .attr("stroke", "black");
+
+    // x-axis title
+    svg.append("text")
+        .attr("x", w / 2 - margin.left)
+        .attr("y", h + margin.bottom * .75)
+          .style("font-size", "15px")
+        .style("font-weight", "500")
+        .text('Energy source');
+
+    // title
+    svg.append("text")
+        .attr("x", w / 2)
+        .attr("y", 0 + margin.top)
+        // make title size dynamic
+        .style("font-size", function() {
+           return  w / 40 + "px";
+        })
+        .style("font-weight", "700")
+        .style("text-anchor", "middle")
+        .text('Worldwide energy production by source in 2015');
     }
+
 
     </script>
   </body>
