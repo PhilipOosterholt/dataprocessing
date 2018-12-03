@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,200i,300,300i,400,400i,500,500i,700,700i" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+  </head>
+  <body>
+    <script>
+
+      // title in browser
+      d3.select("head")
+        .append("title")
+        .text("My bargraph");
+
+      // title, name, description
+      d3.select("body")
+        .append("h1")
+        .text("Worldwide energy production by source in 2015")
+        .append("h3")
+        .text("Created by Philip Oosterholt, student number 10192263");
+
+        var margin = {top: 50, right: 50, bottom: 50, left: 50};
+
+        var dataset = [
+                          [200, 55, 0],
+                          [500, 62, 0],
+                          [300, 54, 0],
+                          [800, 78, 1],
+                          [700, 80, 1],
+                          [100, 45, 0],
+                          [500, 55, 1],
+                          [900, 85, 1],
+                          [600, 75, 0],
+                          [250, 40, 1]
+                      ];
+
+        w = 800 -  margin.left - margin.right;
+        h = 600 -  margin.top - margin.bottom;
+
+        // svg element
+  			var svg = d3.select("body")
+  					.append("svg")
+  					.attr("width", w + margin.left + margin.right)
+  					.attr("height", h + margin.top + margin.bottom)
+            .append("g")
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+
+        var x = d3.scaleLinear()
+              .domain([100,900])
+              .range([25, w - 25])
+              .nice();
+
+        var y = d3.scaleLinear()
+              .domain([40, 85])
+              .range([h - 25, 25])
+              .nice();
+
+        svg.selectAll("circle")
+           .data(dataset)
+           .enter()
+           .append("circle")
+           .attr("cx", function(d) {
+             return x(d[0]);
+            })
+           .attr("cy", function(d) {
+             return y(d[1]);
+            })
+           .attr('fill', function(d, i) {
+             if (d[2] === 1) {
+               return '#2ca25f'
+             }
+             else {
+               return '#e34a33'
+             }
+           })
+           .attr("r", 5);
+
+        var g = svg.append("g")
+        var xAxis = d3.axisBottom(x)
+        var xAxisG = g.append('g').call(xAxis)
+          .attr('transform', `translate(0,${h})`);
+
+        svg.append("g")
+          .attr("class", "y axis") // might not be necessary
+          .call(d3.axisLeft(y));
+
+        legend = svg.append("g")
+          .attr("class","legend")
+          .attr("transform","translate(50,30)")
+          .style("font-size","12px")
+          .call(d3.legend)
+
+    </script>
+  </body>
+</html>
