@@ -37,6 +37,8 @@ function scatter(data) {
      .append('title')
      .text('My scatterplot');
 
+
+
   // svg body element
   let margin = {top: 100, right: 50, bottom: 100, left: 300};
   w = 1200 -  margin.left - margin.right;
@@ -129,19 +131,12 @@ function scatter(data) {
      .attr('transform', 'translate('+ w / 2 + ',' + -25 + ')')
      .text('Life Expectancy in 2017');
 
- // title
- svg.append('text')
-    .attr('class', 'subTitle')
-    .style('text-anchor', 'middle')
-    .attr('transform', 'translate('+ w / 2 + ',' + 0 + ')')
-    .text('Created by Philip Oosterholt - 10192263, source OECD');
-
-// title
-svg.append('text')
-   .attr('class', 'subTitle')
-   .style('text-anchor', 'middle')
-   .attr('transform', 'translate('+ -25 + ',' + 150 + ')')
-   .text('Hover over the dots to see the country');
+  // title
+  svg.append('text')
+     .attr('class', 'subTitle')
+     .style('text-anchor', 'middle')
+     .attr('transform', 'translate('+ w / 2 + ',' + 0 + ')')
+     .text('Created by Philip Oosterholt - 10192263, source OECD');
 
   // legend, please adapt x and y pos
   legend_color(svg, -275, 325, 30, color, 'Life Satisfaction');
