@@ -32,12 +32,18 @@ function scatter(data) {
   // source https://en.wikipedia.org/wiki/List_of_countries_by_body_mass_index
   bmi = [27.2, 25.3, 26.3, 27.3, 26.4, 26, 22.6, 28.1, 25.4, 26.4, 26.7, 25.8, 27.8, 27.3, 32.5, 25.9, 27.8, 26.3, 26.5, 27.3]
 
+  // scale wealth data
+  new_wealth = []
+  for (var i = 0; i < 19; i++){
+    new_wealth.push(wealth[i] / 1000)
+  }
+  wealth = new_wealth
+
+  console.log(wealth)
   // title
   d3.select('head')
      .append('title')
      .text('My scatterplot');
-
-
 
   // svg body element
   let margin = {top: 100, right: 50, bottom: 100, left: 300};
@@ -56,7 +62,7 @@ function scatter(data) {
   size = range_scatter(calculate_minmax(bmi), size_range);
 
   // menu
-  names = ['Disposable Income Household', 'Employment Rate', 'Social Support Rating'];
+  names = ['Disposable Income Household (x1000)', 'Employment Rate', 'Social Support Rating'];
   options = [wealth, jobs, support];
   menu(options, names);
 
@@ -143,7 +149,7 @@ function scatter(data) {
   legend_size(svg, -275, 425, size)
 
   // line of best fit
-  trend = findLineByLeastSquare(data[1], data[4]);
+  trend = findLineByLeastSquare(wealth, exp);
   regression_line(trend)
 }
 
@@ -312,7 +318,7 @@ function updateScatter(data, names) {
   // change x axis
   d3.selectAll('#xaxis')
     .transition()
-    .duration(500)
+    .duration(1500)
     .call(d3.axisBottom(x));
 
   // change scatter dots
@@ -338,7 +344,6 @@ function updateScatter(data, names) {
     .attr('x2', function(d) { return x(trend[1]); })
     .attr('y2', function(d) { return y(trend[3]); })
 }
-
 
 // function adapted from https://dracoblue.net/dev/linear-least-squares-in-javascript/
 // did my own linear regression in week 3, but it would take some time to adapt it in javascript
