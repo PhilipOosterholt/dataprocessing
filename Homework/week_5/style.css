@@ -17,26 +17,43 @@ font-weight: 400;
 }
 
 text {
-font-family: 'Montserrat', sans-serif;
-font-size: 12px;
-font-weight: 500;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
 }
 
+.labelClass {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.titleClass {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 36px;
+  font-weight: 500;
+}
+
+ .subTitle {
+   font-family: 'Montserrat', sans-serif;
+   font-size: 12px;
+   font-weight: 500;
+ }
 #menu {
-position: absolute;
-top: 162px;
-left: 30px;
-width: 100px;
+  position: absolute;
+  top: 125px;
+  left: 30px;
+  width: 230px;
 }
 
 li {
-list-style-type: none;
-cursor: pointer;
-padding-bottom: 5px;
-font-family: 'Montserrat', sans-serif;
-font-size: 16px;
-font-weight: 700;
-color: #909090;
+  list-style-type: none;
+  cursor: pointer;
+  padding-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #909090;
 }
 
 li:hover {
