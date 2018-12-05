@@ -1,0 +1,56 @@
+h1 {
+font-family: 'Montserrat', sans-serif;
+font-size: 24px;
+font-weight: 600;
+}
+
+h3 {
+font-family: 'Montserrat', sans-serif;
+font-size: 14px;
+font-weight: 500;
+}
+
+h5 {
+font-family: 'Montserrat', sans-serif;
+font-size: 14px;
+font-weight: 400;
+}
+
+text {
+font-family: 'Montserrat', sans-serif;
+font-size: 12px;
+font-weight: 500;
+}
+
+#menu {
+position: absolute;
+top: 162px;
+left: 30px;
+width: 100px;
+}
+
+li {
+list-style-type: none;
+cursor: pointer;
+padding-bottom: 5px;
+font-family: 'Montserrat', sans-serif;
+font-size: 16px;
+font-weight: 700;
+color: #909090;
+}
+
+li:hover {
+  color: #00000;
+}
+
+li.preview {
+  font-weight: 400;
+}
+
+li.selected {
+  font-weight: bold;
+}
+
+li:hover {
+  color: #000;
+}
