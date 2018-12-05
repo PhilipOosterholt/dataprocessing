@@ -33,7 +33,7 @@ function scatter(data) {
   bmi = [27.2, 25.3, 26.3, 27.3, 26.4, 26, 22.6, 28.1, 25.4, 26.4, 26.7, 25.8, 27.8, 27.3, 32.5, 25.9, 27.8, 26.3, 26.5, 27.3]
 
   // x axis names
-  names = ['Disposable Income Household (x1000)', 'Employment Rate', 'Social Support Rating'];
+  x_names = ['Disposable Income Household (x1000)', 'Employment Rate', 'Social Support Rating'];
 
   // scale wealth data
   new_wealth = []
@@ -64,10 +64,10 @@ function scatter(data) {
   color = range_scatter(calculate_minmax(sat), color_range);
   size = range_scatter(calculate_minmax(bmi), size_range);
 
-  // menu 
-  menu_names = ['Disposable Income Household', 'Employment Rate', 'Social Support Rating'];
+  // menu
+  descriptions = ['Disposable Income Household', 'Employment Rate', 'Social Support Rating'];
   options = [wealth, jobs, support];
-  menu(options, menu_names);
+  menu(options, descriptions, x_names);
 
   // tooltip text
   tooltip = tooltip();
@@ -131,7 +131,7 @@ function scatter(data) {
      .attr('class', 'labelClass')
      .style('text-anchor', 'middle')
      .attr('transform', 'translate('+ w / 2 + ',' + (h + 50) + ')')
-     .text(names[0]);
+     .text(x_names[0]);
 
   // title
   svg.append('text')
@@ -245,7 +245,7 @@ function range_scatter(data, ranges) {
 
 // provides the menu
 // some of the code is adapated from https://charts.animateddata.co.uk/whatmakesushappy/
-function menu(options, names) {
+function menu(options, descriptions, x_names) {
 
   d3.selectAll('#menu')
      .selectAll('li')
@@ -253,11 +253,11 @@ function menu(options, names) {
      .enter()
      .append('li')
      .text(function(d, i) {
-       return names[i];
+       return descriptions[i];
      })
      // scatterplot updates once user clicks on one of the options
      .on('click', function(d, i) {
-     updateScatter(d, names[i]);
+     updateScatter(d, x_names[i]);
      });
 }
 
@@ -313,7 +313,7 @@ function legend_size(svg, x_pos, y_pos, size) {
     .call(legendSize);
 }
 
-function updateScatter(data, names) {
+function updateScatter(data, x_names) {
 
   // updates linear x axis scale
   x = xScale(data);
@@ -333,7 +333,7 @@ function updateScatter(data, names) {
     });
 
    d3.selectAll('#xLabel')
-     .text(names);
+     .text(x_names);
 
   // linear regression
   trend = findLineByLeastSquare(data, exp);
