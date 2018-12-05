@@ -32,6 +32,9 @@ function scatter(data) {
   // source https://en.wikipedia.org/wiki/List_of_countries_by_body_mass_index
   bmi = [27.2, 25.3, 26.3, 27.3, 26.4, 26, 22.6, 28.1, 25.4, 26.4, 26.7, 25.8, 27.8, 27.3, 32.5, 25.9, 27.8, 26.3, 26.5, 27.3]
 
+  // x axis names
+  names = ['Disposable Income Household (x1000)', 'Employment Rate', 'Social Support Rating'];
+
   // scale wealth data
   new_wealth = []
   for (var i = 0; i < 19; i++){
@@ -61,10 +64,10 @@ function scatter(data) {
   color = range_scatter(calculate_minmax(sat), color_range);
   size = range_scatter(calculate_minmax(bmi), size_range);
 
-  // menu
-  names = ['Disposable Income Household (x1000)', 'Employment Rate', 'Social Support Rating'];
+  // menu 
+  menu_names = ['Disposable Income Household', 'Employment Rate', 'Social Support Rating'];
   options = [wealth, jobs, support];
-  menu(options, names);
+  menu(options, menu_names);
 
   // tooltip text
   tooltip = tooltip();
