@@ -11,7 +11,6 @@ function load_data() {
 
   Promise.all(requests).then(function(response) {
 
-    console.log(response)
     scatter(transformResponse(response, 5));
 
   }).catch(function(e){
@@ -118,10 +117,10 @@ function legend_color(svg, x_pos, y_pos, width, color, title) {
 
   svg.append('g')
      .attr('class', 'legendLinear')
-     .attr('transform', 'translate(-275, 325)');
+     .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
 
   let legendLinear = d3.legendColor()
-     .shapeWidth(30)
+     .shapeWidth(width)
      .orient('horizontal')
      .scale(color)
      .title("Life Satisfaction Rating");
@@ -130,13 +129,12 @@ function legend_color(svg, x_pos, y_pos, width, color, title) {
      .call(legendLinear);
 }
 
-function legend_size(svg, size) {
-
-  d3.select("svg");
+// makes a legend with dynamic sizes
+function legend_size(svg, x_pos, y_pos, size) {
 
   svg.append("g")
     .attr("class", "legendSize")
-    .attr("transform", "translate(-275, 425)");
+    .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
 
   var legendSize = d3.legendSize()
     .scale(size)
@@ -148,18 +146,19 @@ function legend_size(svg, size) {
 
   svg.select(".legendSize")
     .call(legendSize);
-
 }
 
 function updateScatter(data, names) {
 
   x = xScale(data);
 
+  // change x axis
   d3.selectAll('#xaxis')
     .transition()
     .duration(500)
     .call(d3.axisBottom(x));
 
+  // change scatter dots
   d3.selectAll('circle')
     .transition()
     .duration(1500)
@@ -169,40 +168,86 @@ function updateScatter(data, names) {
 
    d3.selectAll('#xLabel')
      .text(names);
+
+  // linear regression
+  trend = findLineByLeastSquare(data, exp);
+
+  // update line of best fit
+  d3.selectAll('#trendline')
+    .transition()
+    .duration(1500)
+    .attr("x1", function(d) { return x(trend[0]); })
+    .attr("y1", function(d) { return y(trend[2]); })
+    .attr("x2", function(d) { return x(trend[1]); })
+    .attr("y2", function(d) { return y(trend[3]); })
 }
 
-function regression(xSeries, ySeries) {
 
-		var reduceSumFunc = function(prev, cur) { return prev + cur; };
+// function adapted from https://dracoblue.net/dev/linear-least-squares-in-javascript/
+// did my own linear regression in week 3, but it would take some time to adapt it in javascript
+// hence I used this function
+function findLineByLeastSquare(values_x, values_y) {
 
-		var xBar = xSeries.reduce(reduceSumFunc) * 1.0 / xSeries.length;
-		var yBar = ySeries.reduce(reduceSumFunc) * 1.0 / ySeries.length;
+    var sum_x = 0;
+    var sum_y = 0;
+    var sum_xy = 0;
+    var sum_xx = 0;
+    var count = 0;
 
-		var ssXX = xSeries.map(function(d) { return Math.pow(d - xBar, 2); })
-			.reduce(reduceSumFunc);
+    // We'll use those variables for faster read/write access.
+    var x = 0;
+    var y = 0;
+    var values_length = values_x.length;
 
-		var ssYY = ySeries.map(function(d) { return Math.pow(d - yBar, 2); })
-			.reduce(reduceSumFunc);
+    // calculate the sum for each of the parts necessary.
+    for (var v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = values_y[v];
+        sum_x += x;
+        sum_y += y;
+        sum_xx += x*x;
+        sum_xy += x*y;
+        count++;
+    }
 
-		var ssXY = xSeries.map(function(d, i) { return (d - xBar) * (ySeries[i] - yBar); })
-			.reduce(reduceSumFunc);
+    // y = x * m + b
+    var m = (count*sum_xy - sum_x*sum_y) / (count*sum_xx - sum_x*sum_x);
+    var b = (sum_y/count) - (m*sum_x)/count;
 
-		var slope = ssXY / ssXX;
-		var intercept = yBar - (xBar * slope);
-		var rSquare = Math.pow(ssXY, 2) / (ssXX * ssYY);
+    // We will make the x and y result line now
+    var result_values_x = [];
+    var result_values_y = [];
 
-		return [slope, intercept, rSquare];
-	}
+    for (var v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = x * m + b;
+        result_values_x.push(x);
+        result_values_y.push(y);
+    }
 
-  //
-  // svg.append('line')
-  //     .attr('x1',x(10000))
-  //     .attr('x2',x(40000))
-  //     .attr('y1',y(75))
-  //     .attr('y2',y(80))
-  //     .attr("stroke-width", 2)
-  //     .attr("stroke", "black");
+    // This part I added to get the coordinates for the line
+    x1 = Math.min.apply(Math, result_values_x);
+    x2 = Math.max.apply(Math, result_values_x);
+    y1 = Math.min.apply(Math, result_values_y);
+    y2 = Math.max.apply(Math, result_values_y);
 
+    return [x1, x2, y1, y2];
+}
+
+function regression_line(trend) {
+
+  // plot line of best fit
+  svg.append("line")
+     .attr('id', 'trendline')
+     .attr("x1", function(d) { return x(trend[0]); })
+     .attr("y1", function(d) { return y(trend[2]); })
+     .attr("x2", function(d) { return x(trend[1]); })
+     .attr("y2", function(d) { return y(trend[3]); })
+     .attr("stroke", "grey")
+     .style('opacity', .4)
+     .attr("stroke-width", 5);
+
+}
 
 // title in browser
 function scatter(data) {
@@ -285,11 +330,13 @@ function scatter(data) {
        tooltip.select('text').text(countries[i]);
      });
 
+  // x axis
   svg.append('g')
      .attr('id', 'xaxis')
      .attr('transform', `translate(0,${h})`)
      .call(d3.axisBottom(x));
 
+  // y axis
   svg.append('g')
      .call(d3.axisLeft(y));
 
@@ -321,31 +368,11 @@ function scatter(data) {
     .attr('transform', 'translate('+ w / 2 + ',' + 0 + ')')
     .text('Created by Philip Oosterholt - 10192263');
 
-
   // legend, please adapt x and y pos
-  legend_color(svg, 550, 20, 30, color, 'title');
-  legend_size(svg, size)
+  legend_color(svg, -275, 325, 30, color, 'Life Satisfaction');
+  legend_size(svg, -275, 425, size)
 
-  var leastSquaresCoeff = leastSquares(xSeries, ySeries);
-
-  // apply the reults of the least squares regression
-  var x1 = xLabels[0];
-  var y1 = leastSquaresCoeff[0] + leastSquaresCoeff[1];
-  var x2 = xLabels[xLabels.length - 1];
-  var y2 = leastSquaresCoeff[0] * xSeries.length + leastSquaresCoeff[1];
-  var trendData = [[x1,y1,x2,y2]];
-
-  var trendline = svg.selectAll(".trendline")
-    .data(trendData);
-
-  trendline.enter()
-    .append("line")
-    .attr("class", "trendline")
-    .attr("x1", function(d) { return xScale(d[0]); })
-    .attr("y1", function(d) { return yScale(d[1]); })
-    .attr("x2", function(d) { return xScale(d[2]); })
-    .attr("y2", function(d) { return yScale(d[3]); })
-    .attr("stroke", "black")
-    .attr("stroke-width", 1);
-
+  // line of best fit
+  trend = findLineByLeastSquare(data[1], data[4]);
+  regression_line(trend)
 }
