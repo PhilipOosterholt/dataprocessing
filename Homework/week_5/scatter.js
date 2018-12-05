@@ -18,243 +18,11 @@ function load_data() {
   });
 }
 
-// function from dataprocessing website
-function transformResponse(data, len_vars){
-
-  let len = data[0].structure.dimensions.observation[0].values.length
-  let countries = [];
-
-  for (i = 0; i < len; i++) {
-    countries.push(data[0].structure.dimensions.observation[0].values[i].name);
-  }
-
-  let dict = data[0].dataSets[0].observations;
-  let values = [];
-
-  for (let key in dict){
-    values.push(dict[key][0]);
-  }
-
-  let array = [];
-  array.push(countries);
-
-  for (i = 0; i < len_vars; i++) {
-    array.push(values.slice(0 + i * len, (len - 1) + i * len));
-  }
-
-  return array;
-}
-
-function svg_element(margin, w, h) {
-
-  // svg element
-  let svg = d3.select('body')
-     .append('svg')
-     .attr('width', w + margin.left + margin.right)
-     .attr('height', h + margin.top + margin.bottom)
-     .append('g')
-     .attr('transform', `translate(${margin.left},${margin.top})`);
-
-  return svg;
-}
-
-function calculate_minmax(data) {
-  bound = [];
-  bound.max = Math.max.apply(Math, data);
-  bound.min = Math.min.apply(Math, data);
-  return bound;
-}
-
-function xScale(data) {
-  bound = calculate_minmax(data);
-  let x = d3.scaleLinear()
-     .domain([bound.min, bound.max])
-     .range([25, w - 25])
-     .nice();
-  return x;
-}
-
-function yScale(data) {
-  bound = calculate_minmax(data);
-  let y = d3.scaleLinear()
-     .domain([bound.min, bound.max])
-     .range([h - 25, 25])
-     .nice();
-  return y;
-}
-
-function range_scatter(data, ranges) {
-  let range = d3.scaleLinear()
-     .domain([data.min, data.max])
-     .range([ranges.min, ranges.max]);
-  return range;
-}
-
-function menu(options, names) {
-  d3.selectAll('#menu')
-     .selectAll('li')
-     .data(options)
-     .enter()
-     .append('li')
-     .text(function(d, i) {
-       return names[i];
-     })
-     .on('click', function(d, i) {
-     updateScatter(d, names[i]);
-     });
-}
-
-function tooltip() {
-  // tooltip adapated from Michael Stanaland’s bar bargraph
-  // see http://bl.ocks.org/mstanaland/6100713 for code
-  let tooltip = svg.append('g')
-     .attr('class', 'tooltip')
-     .style('display', 'none');
-  return tooltip;
-}
-
-function legend_color(svg, x_pos, y_pos, width, color, title) {
-
-  svg.append('g')
-     .attr('class', 'legendLinear')
-     .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
-
-  let legendLinear = d3.legendColor()
-     .shapeWidth(width)
-     .orient('horizontal')
-     .scale(color)
-     .title("Life Satisfaction Rating");
-
-  svg.select('.legendLinear')
-     .call(legendLinear);
-}
-
-// makes a legend with dynamic sizes
-function legend_size(svg, x_pos, y_pos, size) {
-
-  svg.append("g")
-    .attr("class", "legendSize")
-    .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
-
-  var legendSize = d3.legendSize()
-    .scale(size)
-    .shape('circle')
-    .shapePadding(14)
-    .labelOffset(30)
-    .orient('horizontal')
-    .title("Body Mass Index");
-
-  svg.select(".legendSize")
-    .call(legendSize);
-}
-
-function updateScatter(data, names) {
-
-  x = xScale(data);
-
-  // change x axis
-  d3.selectAll('#xaxis')
-    .transition()
-    .duration(500)
-    .call(d3.axisBottom(x));
-
-  // change scatter dots
-  d3.selectAll('circle')
-    .transition()
-    .duration(1500)
-    .attr('cx', function(d, i) {
-      return x(data[i]);
-    });
-
-   d3.selectAll('#xLabel')
-     .text(names);
-
-  // linear regression
-  trend = findLineByLeastSquare(data, exp);
-
-  // update line of best fit
-  d3.selectAll('#trendline')
-    .transition()
-    .duration(1500)
-    .attr("x1", function(d) { return x(trend[0]); })
-    .attr("y1", function(d) { return y(trend[2]); })
-    .attr("x2", function(d) { return x(trend[1]); })
-    .attr("y2", function(d) { return y(trend[3]); })
-}
-
-
-// function adapted from https://dracoblue.net/dev/linear-least-squares-in-javascript/
-// did my own linear regression in week 3, but it would take some time to adapt it in javascript
-// hence I used this function
-function findLineByLeastSquare(values_x, values_y) {
-
-    var sum_x = 0;
-    var sum_y = 0;
-    var sum_xy = 0;
-    var sum_xx = 0;
-    var count = 0;
-
-    // We'll use those variables for faster read/write access.
-    var x = 0;
-    var y = 0;
-    var values_length = values_x.length;
-
-    // calculate the sum for each of the parts necessary.
-    for (var v = 0; v < values_length; v++) {
-        x = values_x[v];
-        y = values_y[v];
-        sum_x += x;
-        sum_y += y;
-        sum_xx += x*x;
-        sum_xy += x*y;
-        count++;
-    }
-
-    // y = x * m + b
-    var m = (count*sum_xy - sum_x*sum_y) / (count*sum_xx - sum_x*sum_x);
-    var b = (sum_y/count) - (m*sum_x)/count;
-
-    // We will make the x and y result line now
-    var result_values_x = [];
-    var result_values_y = [];
-
-    for (var v = 0; v < values_length; v++) {
-        x = values_x[v];
-        y = x * m + b;
-        result_values_x.push(x);
-        result_values_y.push(y);
-    }
-
-    // This part I added to get the coordinates for the line
-    x1 = Math.min.apply(Math, result_values_x);
-    x2 = Math.max.apply(Math, result_values_x);
-    y1 = Math.min.apply(Math, result_values_y);
-    y2 = Math.max.apply(Math, result_values_y);
-
-    return [x1, x2, y1, y2];
-}
-
-function regression_line(trend) {
-
-  // plot line of best fit
-  svg.append("line")
-     .attr('id', 'trendline')
-     .attr("x1", function(d) { return x(trend[0]); })
-     .attr("y1", function(d) { return y(trend[2]); })
-     .attr("x2", function(d) { return x(trend[1]); })
-     .attr("y2", function(d) { return y(trend[3]); })
-     .attr("stroke", "grey")
-     .style('opacity', .4)
-     .attr("stroke-width", 5);
-
-}
-
 // title in browser
 function scatter(data) {
 
   // data in useful variables
   countries = data[0];
-  console.log(countries)
   wealth = data[1];
   jobs = data[2];
   support = data[3];
@@ -342,31 +110,31 @@ function scatter(data) {
 
   // y label
   svg.append('text')
-     .attr("class", "labelClass")
+     .attr('class', 'labelClass')
      .attr('transform', 'translate(-45,' + h / 1.5 + ')rotate(-90)')
      .text('Life Expectancy');
 
   // x label
   svg.append('text')
      .attr('id', 'xLabel')
-     .attr("class", "labelClass")
+     .attr('class', 'labelClass')
      .style('text-anchor', 'middle')
      .attr('transform', 'translate('+ w / 2 + ',' + (h + 50) + ')')
      .text(names[0]);
 
   // title
   svg.append('text')
-     .attr("class", "titleClass")
+     .attr('class', 'titleClass')
      .style('text-anchor', 'middle')
      .attr('transform', 'translate('+ w / 2 + ',' + -25 + ')')
-     .text('Life Expectancy');
+     .text('Life Expectancy in 2017');
 
  // title
  svg.append('text')
-    .attr("class", "subTitle")
+    .attr('class', 'subTitle')
     .style('text-anchor', 'middle')
     .attr('transform', 'translate('+ w / 2 + ',' + 0 + ')')
-    .text('Created by Philip Oosterholt - 10192263');
+    .text('Created by Philip Oosterholt - 10192263, source OECD');
 
   // legend, please adapt x and y pos
   legend_color(svg, -275, 325, 30, color, 'Life Satisfaction');
@@ -375,4 +143,262 @@ function scatter(data) {
   // line of best fit
   trend = findLineByLeastSquare(data[1], data[4]);
   regression_line(trend)
+}
+
+// own function for getting the api data
+function transformResponse(data, len_vars){
+
+  // length of data
+  let len = data[0].structure.dimensions.observation[0].values.length
+  let countries = [];
+
+  // pulls countries used
+  for (i = 0; i < len; i++) {
+    countries.push(data[0].structure.dimensions.observation[0].values[i].name);
+  }
+
+  // pulls all values from dictionary
+  let dict = data[0].dataSets[0].observations;
+  let values = [];
+  for (let key in dict){
+    values.push(dict[key][0]);
+  }
+
+  let array = [];
+  array.push(countries);
+
+  // values are logically ordered (per country), so load them one for one in the datastructure
+  for (i = 0; i < len_vars; i++) {
+    array.push(values.slice(0 + i * len, (len - 1) + i * len));
+  }
+
+  // return end product
+  return array;
+}
+
+// makes svg element
+function svg_element(margin, w, h) {
+
+  // svg element
+  let svg = d3.select('body')
+     .append('svg')
+     .attr('width', w + margin.left + margin.right)
+     .attr('height', h + margin.top + margin.bottom)
+     .append('g')
+     .attr('transform', `translate(${margin.left},${margin.top})`);
+
+  return svg;
+}
+
+// calculates min max for data bounds
+function calculate_minmax(data) {
+
+  bound = [];
+  bound.max = Math.max.apply(Math, data);
+  bound.min = Math.min.apply(Math, data);
+  return bound;
+
+}
+
+// provides (a function for the) linear scale for x values
+function xScale(data) {
+
+  bound = calculate_minmax(data);
+  let x = d3.scaleLinear()
+     .domain([bound.min, bound.max])
+     .range([25, w - 25])
+     .nice();
+  return x;
+
+}
+
+// provides (a function for the) linear scale for y values
+function yScale(data) {
+
+  bound = calculate_minmax(data);
+  let y = d3.scaleLinear()
+     .domain([bound.min, bound.max])
+     .range([h - 25, 25])
+     .nice();
+  return y;
+}
+
+// provides (a function for the) linear scale for color and size ranges
+function range_scatter(data, ranges) {
+
+  let range = d3.scaleLinear()
+     .domain([data.min, data.max])
+     .range([ranges.min, ranges.max]);
+  return range;
+}
+
+// provides the menu
+// some of the code is adapated from https://charts.animateddata.co.uk/whatmakesushappy/
+function menu(options, names) {
+
+  d3.selectAll('#menu')
+     .selectAll('li')
+     .data(options)
+     .enter()
+     .append('li')
+     .text(function(d, i) {
+       return names[i];
+     })
+     // scatterplot updates once user clicks on one of the options
+     .on('click', function(d, i) {
+     updateScatter(d, names[i]);
+     });
+}
+
+// tooltip adapated from Michael Stanaland’s bar bargraph
+// see http://bl.ocks.org/mstanaland/6100713 for code
+function tooltip() {
+
+  let tooltip = svg.append('g')
+     .attr('class', 'tooltip')
+     .style('display', 'none');
+  return tooltip;
+}
+
+// makes a color legend for a variable
+function legend_color(svg, x_pos, y_pos, width, color, title) {
+
+  // creates element for legend
+  svg.append('g')
+     .attr('class', 'legendLinear')
+     .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
+
+  // legend information
+  let legendLinear = d3.legendColor()
+     .shapeWidth(width)
+     .orient('horizontal')
+     .scale(color)
+     .title('Life Satisfaction Rating');
+
+  // creates the legend
+  svg.select('.legendLinear')
+     .call(legendLinear);
+}
+
+// makes a legend with dynamic sizes
+function legend_size(svg, x_pos, y_pos, size) {
+
+  // creates element for legend
+  svg.append('g')
+    .attr('class', 'legendSize')
+    .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
+
+  // legend information
+  let legendSize = d3.legendSize()
+    .scale(size)
+    .shape('circle')
+    .shapePadding(14)
+    .labelOffset(30)
+    .orient('horizontal')
+    .title('Body Mass Index');
+
+  // creates the legend
+  svg.select('.legendSize')
+    .call(legendSize);
+}
+
+function updateScatter(data, names) {
+
+  // updates linear x axis scale
+  x = xScale(data);
+
+  // change x axis
+  d3.selectAll('#xaxis')
+    .transition()
+    .duration(500)
+    .call(d3.axisBottom(x));
+
+  // change scatter dots
+  d3.selectAll('circle')
+    .transition()
+    .duration(1500)
+    .attr('cx', function(d, i) {
+      return x(data[i]);
+    });
+
+   d3.selectAll('#xLabel')
+     .text(names);
+
+  // linear regression
+  trend = findLineByLeastSquare(data, exp);
+
+  // update line of best fit
+  d3.selectAll('#trendline')
+    .transition()
+    .duration(1500)
+    .attr('x1', function(d) { return x(trend[0]); })
+    .attr('y1', function(d) { return y(trend[2]); })
+    .attr('x2', function(d) { return x(trend[1]); })
+    .attr('y2', function(d) { return y(trend[3]); })
+}
+
+
+// function adapted from https://dracoblue.net/dev/linear-least-squares-in-javascript/
+// did my own linear regression in week 3, but it would take some time to adapt it in javascript
+// hence I used this function
+function findLineByLeastSquare(values_x, values_y) {
+
+    let sum_x = 0;
+    let sum_y = 0;
+    let sum_xy = 0;
+    let sum_xx = 0;
+    let count = 0;
+
+    // We'll use those variables for faster read/write access.
+    let x = 0;
+    let y = 0;
+    let values_length = values_x.length;
+
+    // calculate the sum for each of the parts necessary.
+    for (let v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = values_y[v];
+        sum_x += x;
+        sum_y += y;
+        sum_xx += x*x;
+        sum_xy += x*y;
+        count++;
+    }
+
+    // y = x * m + b
+    let m = (count*sum_xy - sum_x*sum_y) / (count*sum_xx - sum_x*sum_x);
+    let b = (sum_y/count) - (m*sum_x)/count;
+
+    // We will make the x and y result line now
+    let result_values_x = [];
+    let result_values_y = [];
+
+    for (let v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = x * m + b;
+        result_values_x.push(x);
+        result_values_y.push(y);
+    }
+
+    // This part I added to get the coordinates for the line
+    x1 = Math.min.apply(Math, result_values_x);
+    x2 = Math.max.apply(Math, result_values_x);
+    y1 = Math.min.apply(Math, result_values_y);
+    y2 = Math.max.apply(Math, result_values_y);
+
+    return [x1, x2, y1, y2];
+}
+
+function regression_line(trend) {
+
+  // plot line of best fit
+  svg.append('line')
+     .attr('id', 'trendline')
+     .attr('x1', function(d) { return x(trend[0]); })
+     .attr('y1', function(d) { return y(trend[2]); })
+     .attr('x2', function(d) { return x(trend[1]); })
+     .attr('y2', function(d) { return y(trend[3]); })
+     .attr('stroke', 'grey')
+     .style('opacity', .4)
+     .attr('stroke-width', 5);
 }
