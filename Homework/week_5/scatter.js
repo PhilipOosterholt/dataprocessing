@@ -136,6 +136,13 @@ function scatter(data) {
     .attr('transform', 'translate('+ w / 2 + ',' + 0 + ')')
     .text('Created by Philip Oosterholt - 10192263, source OECD');
 
+// title
+svg.append('text')
+   .attr('class', 'subTitle')
+   .style('text-anchor', 'middle')
+   .attr('transform', 'translate('+ -25 + ',' + 150 + ')')
+   .text('Hover over the dots to see the country');
+
   // legend, please adapt x and y pos
   legend_color(svg, -275, 325, 30, color, 'Life Satisfaction');
   legend_size(svg, -275, 425, size)
