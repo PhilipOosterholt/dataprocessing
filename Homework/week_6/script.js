@@ -21,7 +21,7 @@ var color = d3.scaleThreshold()
 
 var path = d3.geoPath();
 
-var svg = d3.select("body")
+var svg = d3.select("#svg1")
             .append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -93,16 +93,29 @@ function ready(error, data, nkill) {
       .style('text-anchor', 'middle')
       .attr('transform', 'translate('+ 1000 + ',' + 50 + ')')
       .text('Introduction title');
-
 }
 
 function linechart() {
 
   var margin = {top: 0, right: 0, bottom: 0, left: 0},
-              width = 100 - margin.left - margin.right,
+              width = 0 - margin.left - margin.right,
               height = 100 - margin.top - margin.bottom;
 
   svg2 = svg_element(margin, 100, 100)
+
+  // test dataset
+  year = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
+  deaths = [100, 200, 200, 300, 250, 600, 900, 1000, 900, 1400, 1500]
+
+  var x = d3.scaleTime().rangeRound([0, 500]);
+  var y = d3.scaleLinear().rangeRound([500, 0]);
+
+  var line = d3.line()
+   .x(function(d) { return x(year)})
+   .y(function(d) { return y(deaths)})
+   x.domain(d3.extent(data, function(d) { return year}));
+   y.domain(d3.extent(data, function(d) { return deaths }));
+
 
 }
 
@@ -110,7 +123,7 @@ function linechart() {
 function svg_element(margin, w, h) {
 
   // svg element
-  let svg = d3.select('body')
+  let svg2 = d3.select("#svg2")
      .append('svg')
      .attr('width', w + margin.left + margin.right)
      .attr('height', h + margin.top + margin.bottom)
@@ -118,4 +131,27 @@ function svg_element(margin, w, h) {
      .attr('transform', `translate(${margin.left},${margin.top})`);
 
   return svg;
+}
+
+// provides (a function for the) linear scale for x values
+function xScale(data) {
+
+  bound = calculate_minmax(data);
+  let x = d3.scaleLinear()
+     .domain([bound.min, bound.max])
+     .range([25, w - 25])
+     .nice();
+  return x;
+
+}
+
+// provides (a function for the) linear scale for y values
+function yScale(data) {
+
+  bound = calculate_minmax(data);
+  let y = d3.scaleLinear()
+     .domain([bound.min, bound.max])
+     .range([h - 25, 25])
+     .nice();
+  return y;
 }
