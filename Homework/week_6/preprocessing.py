@@ -1,7 +1,8 @@
 import pandas as pd
 import csv
 import json
-
+import numpy as np
+from collections import defaultdict
 
 
 database = 'dataset.csv'
@@ -21,8 +22,6 @@ df = df[df.year.between(2007, 2017)]
 pd.set_option('display.max_row', 1000)
 
 df_line = df.groupby(['country', 'year']).sum().reset_index()
-
-# print(df_line)
 
 # sum all kills based on country
 df = df.drop(columns = 'year')
@@ -47,32 +46,37 @@ df_new = df_new.fillna(0)
 df_new.to_csv('test.csv')
 
 # make a dictionary
-
-countries = {}
-type = {}
-years = {2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0, 2014: 0, 2015: 0, 2016: 0, 2017: 0}
+dictionary = {}
 
 # create list with all countries with deaths related to Terrorism
 list_countries = df_new['country'].unique()
+list_countries = list_countries.tolist()
 
 # for country in list with countries
-for i in list_countries:
-     # make a key country with 10 different years
-    countries[i] = years
+for countries in list_countries:
+     # I wanted to use a dictionary in dictionary, but same keys are not supported
+     # I couldn't change the data in the second dictionary without altering every
+     # single value, hence I've used a list
+    dictionary[countries] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # load data from pandas dataframe, convert into dictionary
-for c in list_countries:
-    country = df_line[df_line.country==c]
+for x in list_countries:
+
+    country = df_line[df_line.country == x]
+
     for i in range(len(country)):
+
         year = country.iloc[i][1]
-        countries[c][year] = country.iloc[i][2]
+        year = year - 2007
+        kills = country.iloc[i][2]
+        dictionary[x][year] = kills
 
 #Get the file name for the new file to write
 filter = "JSON File (*.json)|*.json|All Files (*.*)|*.*||"
-filename = 'bar.json'
+filename = 'line.json'
 
 # If the file name exists, write a JSON string into the file.
 if filename:
     # Writing JSON data
     with open(filename, 'w') as f:
-        json.dump(countries, f)
+        json.dump(dictionary, f)
