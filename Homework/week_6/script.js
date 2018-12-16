@@ -1,7 +1,6 @@
 var format = d3.format(",");
 
-
-// Set tooltips
+// set tooltips
 var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
@@ -9,13 +8,15 @@ var tip = d3.tip()
               return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Number of deaths: </strong><span class='details'>" + format(d.nkill) +"</span>";
             })
 
-var margin = {top: 150, right: 325, bottom: 0, left: 0},
+// margins worldmap
+var margin = {top: 125, right: 325, bottom: 0, left: 0},
             width = 1160 - margin.left - margin.right,
-            height = 900 - margin.top - margin.bottom;
+            height = 800 - margin.top - margin.bottom;
 
-var color = d3.scaleThreshold()
-    .domain([0,10,250,500,1000,2500,7500,25000,50000])
-    .range(["rgb(255,247,236)", "rgb(254,232,200)", "rgb(253,212,158)", "rgb(253,187,132)", "rgb(252,141,89)", "rgb(239,101,72)","rgb(215,48,31)","rgb(153,0,0)"]);
+
+// dynamic color sizes
+color_range = {min: 'rgb(254,242,225)', max: 'rgb(127,0,0)'};
+color = color_map(color_range);
 
 var path = d3.geoPath();
 
@@ -35,15 +36,20 @@ var path = d3.geoPath().projection(projection);
 svg.call(tip);
 
 queue()
-    .defer(d3.json, "world_countries.json")
+    .defer(d3.json, "world_countries2.json")
     .defer(d3.csv, "test.csv")
     .defer(d3.json, "line.json")
-    .await(ready);
+    .await(map);
 
-function ready(error, data, nkill, data2) {
+// map function
+// map is adapated from 
+function map(error, data, nkill, data2) {
   var nkillById = {};
 
-  svg2 = linechart(data2)
+  // draw line graph, return svg element for linked views
+  svg2 = draw_chart(data2)
+  names = []
+  data_line = []
 
   nkill.forEach(function(d) { nkillById[d.id] = +d.nkill; });
   data.features.forEach(function(d) { d.nkill = nkillById[d.id] });
@@ -71,9 +77,18 @@ function ready(error, data, nkill, data2) {
         .on("click", function(d) {
 
           name = Object.values(d.properties)[0]
-          data = data2[name]
-          draw_new_line(svg2, data, 500, 350, 15000)
+          if (data2[name] == null) {
+            data_line.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+          }
+          else {
+          data_line.push(data2[name])
+          }
 
+          names.push(name)
+
+          if (names.length === 2) {
+            draw_new_line(svg2, data_line, names, 500, 350)
+          }
 
         })
         .on('mouseout', function(d){
@@ -96,49 +111,31 @@ function ready(error, data, nkill, data2) {
       .attr('transform', 'translate('+ width / 2 + ',' + 50 + ')')
       .text('Deaths by Terrorism between 2007-2017');
 
-  svg.append('text')
-      .attr('class', "h1")
-      .style('text-anchor', 'middle')
-      .attr('transform', 'translate('+ 1000 + ',' + 50 + ')')
-      .text('Introduction title');
 }
 
-function linechart(data) {
+function draw_chart(data) {
 
   // 2
-  var margin = {top: 225, right: 50, bottom: 25, left: 50},
+  var margin = {top: 310, right: 250, bottom: 25, left: 50},
 
-  width = 600 - margin.left - margin.right,
-  height = 600 - margin.top - margin.bottom;
+  width = 800 - margin.left - margin.right,
+  height = 685 - margin.top - margin.bottom;
+  max = 50
 
-  test = data['Afghanistan']
-  test = Object.keys(test)
-  data_test = data['Afghanistan']
-
-  // test dataset
   years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
-
-  max = Math.max.apply(Math, data_test)
-  max = Math.round(max)
-  max = 15000
+  // for proper x scale years
+  var parseTime = d3.timeParse("%Y");
 
   // 5. X scale will use the index of our data
-  var xScale = d3.scaleLinear()
-      .domain([2007, 2017]) // input
-      .range([25, width]); // output
+  var xScale = d3.scaleTime()
+      // .domain([2007, 2017]) // input
+      .range([25, width]) // output
+      .domain(d3.extent(years, function(d) { return parseTime(d)}));
 
   // 6. Y scale will use the randomly generate number
   var yScale = d3.scaleLinear()
       .domain([0, max]) // input
       .range([height, 0]); // output
-
-  // 7. d3's line generator
-  var line = d3.line()
-      .x(function(d, i) {
-        return xScale(years[i]); }) // set the x values for the line generator
-      .y(function(d) {
-        return yScale(d); }) // set the y values for the line generator
-      .curve(d3.curveMonotoneX) // apply smoothing to the line
 
   // 1. Add the SVG to the page and employ #2
   var svg2 = d3.select("#svg2").append("svg")
@@ -149,69 +146,121 @@ function linechart(data) {
 
   // 3. Call the x axis in a group tag
   svg2.append("g")
-      .attr("class", "x axis")
+      .attr("id", "xaxis")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
 
   // 4. Call the y axis in a group tag
   svg2.append("g")
-      .attr("class", "y axis")
+      .attr("id", "yaxis")
       .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-  // 9. Append the path, bind the data, and call the line generator
-  svg2.append("path")
-      .datum(data_test) // 10. Binds data to the line
-      .attr("stroke", "#ffab00")
-      .attr("fill", "none")
-      .attr("stroke-width", '3')
-      .attr("class", "line") // Assign a class for styling
-      .attr("d", line); // 11. Calls the line generator
+  svg2.append('text')
+  .attr('class', "title_line")
+  .attr("transform", "translate(" + 0  +  "," + -25 + ")")
+  .text('Deaths by terrorism between 2007-2017 by country')
 
-  // 12. Appends a circle for each datapoint
-  svg2.selectAll(".dot")
-      .data(data_test)
-    .enter().append("circle") // Uses the enter().append() method
-      .attr("class", "dot") // Assign a class for styling
-      .attr("cx", function(d, i) { return xScale(years[i]) })
-      .attr("cy", function(d) { return yScale(d) })
-      .attr("r", 5)
-      .attr('fill', '#ffab00')
-      .attr('stroke', '#fff');
+  svg2.append('text')
+  .attr('class', "button")
+  .attr("transform", "translate(25,25)")
+  .text('Clear graph')
+  .on('click', function(d, i) {
+    clear_lines(svg2)
+    names = []
+    data_line = []
+  });
 
-  test2 = data['Iraq']
-  draw_new_line(svg2, test2, width, height, max)
 
+  // return svg for linked views with worldmap
   return svg2
-
 }
 
-function draw_new_line(svg2, data, width, height, max){
+function draw_new_line(svg, data, names, width, height){
+
+  max = 0
+  years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
+  colors = ['#762a83', '#1b7837']
+
+  var parseTime = d3.timeParse("%Y");
+
+  for (var i = 0; i < 2; i++) {
+    current_max = Math.max.apply(Math, data[i])
+    if (current_max > max) {
+      max = current_max;
+    }
+  }
+
+  max = Math.round(max) * 1.3;
+
+  if (max < 50) {
+    max = 50
+  }
 
   // 7. d3's line generator
   var line = d3.line()
       .x(function(d, i) {
-        return xScale(years[i]); }) // set the x values for the line generator
+        return xScale(parseTime(years[i])); }) // set the x values for the line generator
       .y(function(d) {
         return yScale(d); }) // set the y values for the line generator
       .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-      // 5. X scale will use the index of our data
-      var xScale = d3.scaleLinear()
-          .domain([2007, 2017]) // input
-          .range([25, width]); // output
+  // 5. X scale will use the index of our data
+  var xScale = d3.scaleTime()
+      .domain([parseTime(2007), parseTime(2017)]) // input
+      .range([25, width]); // output
 
-      // 6. Y scale will use the randomly generate number
-      var yScale = d3.scaleLinear()
-          .domain([0, max]) // input
-          .range([height, 0]); // output
+  // 6. Y scale will use the randomly generate number
+  var yScale = d3.scaleLinear()
+      .domain([0, max]) // input
+      .range([height, 0]); // output
 
+for (var i = 0; i < 2; i++) {
   // 9. Append the path, bind the data, and call the line generator
-  svg2.append("path")
-      .datum(data) // 10. Binds data to the line
-      .attr("stroke", "#ffab00")
-      .attr("fill", "none")
-      .attr("stroke-width", '3')
+  svg.append("path")
+      .datum(data[i]) // 10. Binds data to the line
+      .attr("stroke", colors[i])
       .attr("class", "line") // Assign a class for styling
       .attr("d", line); // 11. Calls the line generator
-
 }
+
+  // 3. Call the x axis in a group tag
+  d3.selectAll('#xaxis')
+      .transition()
+      .duration(500)
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xScale)); // Create an axis component with d3.axisBottom
+
+  // 4. Call the y axis in a group tag
+  d3.selectAll('#yaxis')
+      .transition()
+      .duration(500)
+      .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
+
+  for (var i = 0; i < 2; i++) {
+    // 9. Append the path, bind the data, and call the line generator
+    svg.append('text')
+    .attr('class', "legend")
+    .attr("transform", "translate(525," + (100 + i * 20) + ")")
+    .attr("fill", colors[i])
+    .text(names[i])
+  }
+  }
+
+  // clears path and legend elements from svg
+  function clear_lines(svg) {
+    d3.selectAll('.line').remove()
+    d3.selectAll('.legend').remove()
+  }
+
+
+  function color_map(ranges) {
+
+    // color coding, I use an aribtray map here, because otherwise it's
+    // incredibly difficult to see the other countries besides Iraq and
+    // Afghanistan
+    let range = d3.scaleLinear()
+       .domain([0, 8000])
+       .range([ranges.min, ranges.max]);
+    return range;
+
+  }

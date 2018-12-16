@@ -30,6 +30,7 @@ df = df.groupby(['country']).sum()
 
 # import country codes
 df_ids = pd.read_csv(country_ids, sep=';', usecols=['country', 'id'])
+df_ids_copy = df_ids
 df_ids = df_ids.set_index('country')
 df1 = df.join(df_ids)
 df1 = df1[df1.id != 'not listed']
@@ -49,7 +50,7 @@ df_new.to_csv('test.csv')
 dictionary = {}
 
 # create list with all countries with deaths related to Terrorism
-list_countries = df_new['country'].unique()
+list_countries = df_ids_copy['country'].unique()
 list_countries = list_countries.tolist()
 
 # for country in list with countries
