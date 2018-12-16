@@ -6,7 +6,6 @@ var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
             .html(function(d) {
-              console.log(d)
               return "<strong>Country: </strong><span class='details'>" + d.properties.name + "<br></span>" + "<strong>Number of deaths: </strong><span class='details'>" + format(d.nkill) +"</span>";
             })
 
@@ -44,8 +43,7 @@ queue()
 function ready(error, data, nkill, data2) {
   var nkillById = {};
 
-  linechart(data2)
-
+  svg2 = linechart(data2)
 
   nkill.forEach(function(d) { nkillById[d.id] = +d.nkill; });
   data.features.forEach(function(d) { d.nkill = nkillById[d.id] });
@@ -65,11 +63,18 @@ function ready(error, data, nkill, data2) {
         .style('stroke-width', 0.3)
         .on('mouseover', function(d){
           tip.show(d);
-
           d3.select(this)
             .style("opacity", 1)
             .style("stroke","white")
             .style("stroke-width",3);
+        })
+        .on("click", function(d) {
+
+          name = Object.values(d.properties)[0]
+          data = data2[name]
+          draw_new_line(svg2, data, 500, 350, 15000)
+
+
         })
         .on('mouseout', function(d){
           tip.hide(d);
@@ -112,14 +117,10 @@ function linechart(data) {
 
   // test dataset
   years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
-  data.death = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
-
-  // The number of datapoints
-  var n = 11;
 
   max = Math.max.apply(Math, data_test)
-  max = max * 1.5
   max = Math.round(max)
+  max = 15000
 
   // 5. X scale will use the index of our data
   var xScale = d3.scaleLinear()
@@ -135,13 +136,9 @@ function linechart(data) {
   var line = d3.line()
       .x(function(d, i) {
         return xScale(years[i]); }) // set the x values for the line generator
-      .y(function(d, i) {
-        y = data_test[i]
-        return yScale(y); }) // set the y values for the line generator
+      .y(function(d) {
+        return yScale(d); }) // set the y values for the line generator
       .curve(d3.curveMonotoneX) // apply smoothing to the line
-
-  // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-  var dataset = d3.range(n).map(function(d, i) { return {"y": data.death[i] } })
 
   // 1. Add the SVG to the page and employ #2
   var svg2 = d3.select("#svg2").append("svg")
@@ -163,7 +160,7 @@ function linechart(data) {
 
   // 9. Append the path, bind the data, and call the line generator
   svg2.append("path")
-      .datum(dataset) // 10. Binds data to the line
+      .datum(data_test) // 10. Binds data to the line
       .attr("stroke", "#ffab00")
       .attr("fill", "none")
       .attr("stroke-width", '3')
@@ -172,12 +169,49 @@ function linechart(data) {
 
   // 12. Appends a circle for each datapoint
   svg2.selectAll(".dot")
-      .data(dataset)
+      .data(data_test)
     .enter().append("circle") // Uses the enter().append() method
       .attr("class", "dot") // Assign a class for styling
-      .attr("cx", function(d, i) { return xScale(test[i]) })
-      .attr("cy", function(d) { return yScale(d.y) })
-      .attr("r", 3)
+      .attr("cx", function(d, i) { return xScale(years[i]) })
+      .attr("cy", function(d) { return yScale(d) })
+      .attr("r", 5)
       .attr('fill', '#ffab00')
       .attr('stroke', '#fff');
+
+  test2 = data['Iraq']
+  draw_new_line(svg2, test2, width, height, max)
+
+  return svg2
+
+}
+
+function draw_new_line(svg2, data, width, height, max){
+
+  // 7. d3's line generator
+  var line = d3.line()
+      .x(function(d, i) {
+        return xScale(years[i]); }) // set the x values for the line generator
+      .y(function(d) {
+        return yScale(d); }) // set the y values for the line generator
+      .curve(d3.curveMonotoneX) // apply smoothing to the line
+
+      // 5. X scale will use the index of our data
+      var xScale = d3.scaleLinear()
+          .domain([2007, 2017]) // input
+          .range([25, width]); // output
+
+      // 6. Y scale will use the randomly generate number
+      var yScale = d3.scaleLinear()
+          .domain([0, max]) // input
+          .range([height, 0]); // output
+
+  // 9. Append the path, bind the data, and call the line generator
+  svg2.append("path")
+      .datum(data) // 10. Binds data to the line
+      .attr("stroke", "#ffab00")
+      .attr("fill", "none")
+      .attr("stroke-width", '3')
+      .attr("class", "line") // Assign a class for styling
+      .attr("d", line); // 11. Calls the line generator
+
 }
