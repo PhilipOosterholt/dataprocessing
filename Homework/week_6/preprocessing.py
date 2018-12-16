@@ -73,7 +73,7 @@ for x in list_countries:
         dictionary[x][year] = kills
 
 #Get the file name for the new file to write
-filter = "JSON File (*.json)|*.json|All Files (*.*)|*.*||"
+# filter = "JSON File (*.json)|*.json|All Files (*.*)|*.*||"
 filename = 'line.json'
 
 # If the file name exists, write a JSON string into the file.
