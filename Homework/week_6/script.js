@@ -63,7 +63,7 @@ function map(values, nkill) {
     d.nkill = nkillById[d.id] })
 
   // draw line graph, return svg element for linked views
-  svg2 = draw_chart(values[1])
+  svg2 = draw_chart(values[1], svg)
   names = []
   data_line = []
 
@@ -102,7 +102,11 @@ function map(values, nkill) {
           names.push(name)
 
           if (names.length === svg2.line_size) {
-            draw_new_line(svg2, data_line, names, svg2.width, svg2.height)
+            draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
+          }
+
+          if (names.length < (svg2.line_size + 1)) {
+            selection(svg, name, names.length)
           }
 
         })
@@ -128,13 +132,22 @@ function map(values, nkill) {
       .attr('transform', 'translate('+ width / 2 + ',' + 25 + ')')
       .text('Deaths by Terrorism between 2007-2017');
 
+// for (var i = 0; i < 1, i++)
+  // title
+  svg.append('text')
+      .attr('class', "text")
+      .style('text-anchor', 'middle')
+      .attr('transform', 'translate('+ (width - 115) + ',' + 60 + ')')
+      .text('Your current selection:');
+
+
   // creates legend color
   legend_color(svg, 500, 575, color, 'Deaths')
 
 }
 
 // function draws the initial graph without the lines themselves yet
-function draw_chart(data) {
+function draw_chart(data, svg) {
 
   // margins
   var margin = {top: 310, right: 250, bottom: 25, left: 50},
@@ -191,6 +204,7 @@ function draw_chart(data) {
   .text('Clear graph')
   .on('click', function(d, i) {
     clear_lines(svg2)
+    remove_selection(svg)
     names = []
     data_line = []
   });
@@ -204,6 +218,7 @@ function draw_chart(data) {
     // updates size and clears the line graph
     svg2.line_size = 2
     clear_lines(svg2)
+    remove_selection(svg)
     names = []
     data_line = []
   });
@@ -217,6 +232,7 @@ function draw_chart(data) {
     // updates size and clears the line graph
     svg2.line_size = 3
     clear_lines(svg2)
+    remove_selection(svg)
     names = []
     data_line = []
   });
@@ -231,10 +247,8 @@ function draw_chart(data) {
   return svg2
 }
 
-function draw_new_line(svg, data, names, width, height){
+function draw_new_line(svg, svg_map, data, names, width, height){
 
-  console.log(data)
-  console.log(names)
   max = 0
   years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
   colors = ['#fdbb84', '#e34a33',  '#525252']
@@ -344,4 +358,22 @@ for (var i = 0; i < svg.line_size; i++) {
     // creates the legend
     svg.select('.legendLinear')
        .call(legendLinear);
+  }
+
+  function selection(svg, name, padding) {
+
+  svg.append('text')
+      .attr('class', "selection")
+      .style('text-anchor', 'middle')
+      .attr('transform', 'translate('+ (width - 115) + ',' + (60 + (padding * 20)) + ')')
+      .text(name);
+
+      return svg
+  }
+
+  function remove_selection(svg) {
+
+  d3.selectAll('.selection').remove()
+
+      return svg
   }
