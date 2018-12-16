@@ -41,8 +41,8 @@ queue()
     .defer(d3.json, "line.json")
     .await(map);
 
-// map function
-// map is adapated from 
+// map function j
+// map is adapated from
 function map(error, data, nkill, data2) {
   var nkillById = {};
 
