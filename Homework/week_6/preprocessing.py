@@ -14,9 +14,7 @@ df = pd.read_csv(database, sep=';', usecols=['year', 'country', 'nkill'])
 # cleaning data
 df = df.dropna()
 df = df[df.nkill != 0]
-# df = df[df.attacktype != 'Unknown']
-# df = df[df.weaptype1_txt != 'Unknown']
-# df = df[df.targtype1_txt != 'Unknown']
+
 # select years attacks of the last 10 years
 df = df[df.year.between(2007, 2017)]
 pd.set_option('display.max_row', 1000)
@@ -43,7 +41,9 @@ df1 = df1.set_index('id')
 df_new = df2.join(df1['nkill'])
 df_new = df_new.fillna(0)
 
-# print(df_line)
+
+print(df_new)
+# # print(df_line)
 df_new.to_csv('test.csv')
 
 # make a dictionary

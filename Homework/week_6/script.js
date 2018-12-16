@@ -15,7 +15,7 @@ var margin = {top: 125, right: 325, bottom: 0, left: 0},
 
 
 // dynamic color sizes
-color_range = {min: 'rgb(254,242,225)', max: 'rgb(127,0,0)'};
+color_range = {min: 'rgb(254,232,200)', max: 'rgb(0,0,0)'};
 color = color_map(color_range);
 
 var path = d3.geoPath();
@@ -45,6 +45,8 @@ queue()
 // map is adapated from
 function map(error, data, nkill, data2) {
   var nkillById = {};
+
+  console.log(data)
 
   // draw line graph, return svg element for linked views
   svg2 = draw_chart(data2)
@@ -77,6 +79,8 @@ function map(error, data, nkill, data2) {
         .on("click", function(d) {
 
           name = Object.values(d.properties)[0]
+          console.log(name)
+
           if (data2[name] == null) {
             data_line.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
           }
@@ -110,6 +114,8 @@ function map(error, data, nkill, data2) {
       .style('text-anchor', 'middle')
       .attr('transform', 'translate('+ width / 2 + ',' + 50 + ')')
       .text('Deaths by Terrorism between 2007-2017');
+
+  legend_color(svg, 500, 575, color, 'Deaths')
 
 }
 
@@ -179,7 +185,7 @@ function draw_new_line(svg, data, names, width, height){
 
   max = 0
   years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
-  colors = ['#762a83', '#1b7837']
+  colors = ['#fdbb84', '#525252']
 
   var parseTime = d3.timeParse("%Y");
 
@@ -263,4 +269,24 @@ for (var i = 0; i < 2; i++) {
        .range([ranges.min, ranges.max]);
     return range;
 
+  }
+
+  // makes a color legend for a variable
+  function legend_color(svg, x_pos, y_pos, color, title) {
+
+    // creates element for legend
+    svg.append('g')
+       .attr('class', 'legendLinear')
+       .attr('transform', 'translate(' + x_pos + ', ' + y_pos + ')');
+
+    // legend information
+    let legendLinear = d3.legendColor()
+       .shapeWidth(50)
+       .orient('horizontal')
+       .scale(color)
+       .title(title);
+
+    // creates the legend
+    svg.select('.legendLinear')
+       .call(legendLinear);
   }
