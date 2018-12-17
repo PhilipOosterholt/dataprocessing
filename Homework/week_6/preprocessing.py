@@ -38,12 +38,10 @@ df2 = df2[df2.Column1 != 'not listed']
 df2 = df2.drop(columns = 'Column1')
 df2 = df2.set_index('id')
 df1 = df1.set_index('id')
+df1['nkill'] = df1['nkill'].round()
 df_new = df2.join(df1['nkill'])
 df_new = df_new.fillna(0)
 
-
-print(df_new)
-# # print(df_line)
 df_new.to_csv('test.csv')
 
 # make a dictionary
