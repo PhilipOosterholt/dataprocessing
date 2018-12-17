@@ -225,7 +225,7 @@ function draw_chart(data, svg_map) {
   // button for 2 country line graph
   svg_line.append('text')
       .attr('class', "button")
-      .attr("transform", "translate(150,25)")
+      .attr("transform", "translate(100,25)")
       .text('DRAW')
       .on('click', function(d, i) {
         // updates size and clears the line graph
