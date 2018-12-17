@@ -105,7 +105,7 @@ function map(values, nkill) {
             draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
           }
 
-          if (names.length < (svg2.line_size + 1)) {
+          if (names.length < 5) {
             selection(svg, name, names.length)
           }
 
@@ -209,39 +209,45 @@ function draw_chart(data, svg) {
     data_line = []
   });
 
-  // button for 2 country line graph
-  svg2.append('text')
-  .attr('class', "button")
-  .attr("transform", "translate(150,25)")
-  .text('2 countries')
-  .on('click', function(d, i) {
-    // updates size and clears the line graph
-    svg2.line_size = 2
-    clear_lines(svg2)
-    remove_selection(svg)
-    names = []
-    data_line = []
-  });
-
-  // button for 2 country line graph
-  svg2.append('text')
-  .attr('class', "button")
-  .attr("transform", "translate(250,25)")
-  .text('3 countries')
-  .on('click', function(d, i) {
-    // updates size and clears the line graph
-    svg2.line_size = 3
-    clear_lines(svg2)
-    remove_selection(svg)
-    names = []
-    data_line = []
-  });
-
   // give the proper width and heights to the map function
   // otherwise we cannot dynamically change the sizes
   svg2.width = width
   svg2.height = height
-  svg2.line_size = 2
+
+  console.log(svg2)
+  // button for 2 country line graph
+  svg2.append('text')
+  .attr('class', "button")
+  .attr("transform", "translate(150,25)")
+  .text('Draw')
+  .on('click', function(d, i) {
+    // updates size and clears the line graph
+
+    svg2.len = names.length
+    draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
+    //
+    // svg2.line_size = 2
+    // clear_lines(svg2)
+    // remove_selection(svg)
+    // names = []
+    // data_line = []
+  });
+
+  // // button for 2 country line graph
+  // svg2.append('text')
+  // .attr('class', "button")
+  // .attr("transform", "translate(250,25)")
+  // .text('3 countries')
+  // .on('click', function(d, i) {
+  //   // updates size and clears the line graph
+  //   svg2.line_size = 3
+  //   clear_lines(svg2)
+  //   remove_selection(svg)
+  //   names = []
+  //   data_line = []
+  // });
+
+
 
   // return svg for linked views with worldmap
   return svg2
@@ -256,7 +262,7 @@ function draw_new_line(svg, svg_map, data, names, width, height){
   var parseTime = d3.timeParse("%Y");
 
   // update maximum of range
-  for (var i = 0; i < svg.line_size; i++) {
+  for (var i = 0; i < svg.len; i++) {
     current_max = Math.max.apply(Math, data[i])
     if (current_max > max) {
       max = current_max;
@@ -289,7 +295,7 @@ function draw_new_line(svg, svg_map, data, names, width, height){
       .domain([0, max]) // input
       .range([height, 0]); // output
 
-for (var i = 0; i < svg.line_size; i++) {
+for (var i = 0; i < svg.len; i++) {
   // 9. Append the path, bind the data, and call the line generator
   svg.append("path")
       .datum(data[i]) // 10. Binds data to the line
@@ -311,7 +317,7 @@ for (var i = 0; i < svg.line_size; i++) {
       .duration(500)
       .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-  for (var i = 0; i < svg.line_size; i++) {
+  for (var i = 0; i < svg.len; i++) {
     // 9. Append the path, bind the data, and call the line generator
     svg.append('text')
     .attr('class', "legend")
