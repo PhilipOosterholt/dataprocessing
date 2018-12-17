@@ -1,13 +1,16 @@
+// JSON files
 var files = ["world_countries2.json", "line.json"];
 
+// load files
 Promise.all(files.map(url => d3.json(url))).then(function(values) {
 
+  // csv file
   d3.csv('test.csv')
     .then(function(nkill) {
+    // give map function the data
     map(values, nkill)
   });
 });
-
 
 var format = d3.format(",");
 
@@ -24,9 +27,12 @@ var margin = {top: 150, right: 325, bottom: 0, left: 0},
             width = 1160 - margin.left - margin.right,
             height = 800 - margin.top - margin.bottom;
 
+// variables for selection line graph purposes
+names = []
+data_line = []
 
 // dynamic color sizes
-color_range = {min: 'rgb(254,232,200)', max: 'rgb(0,0,0)'};
+color_range = {min: 'rgb(255,247,236)', max: 'rgb(50,0,0)'};
 color = color_map(color_range);
 
 // world map stuff
@@ -39,6 +45,8 @@ var svg = d3.select("#svg1")
             .attr("height", height)
             .append('g')
             .attr('class', 'map');
+
+svg.draw = "False"
 
 // world map stuff
 var projection = d3.geoMercator()
@@ -64,8 +72,6 @@ function map(values, nkill) {
 
   // draw line graph, return svg element for linked views
   svg2 = draw_chart(values[1], svg)
-  names = []
-  data_line = []
 
   // world map
   svg.append("g")
@@ -84,29 +90,45 @@ function map(values, nkill) {
         .on('mouseover', function(d){
           tip.show(d);
           d3.select(this)
-            .style("opacity", 1)
-            .style("stroke","white")
-            .style("stroke-width",3);
+            .style('opacity', 1)
+            .style('stroke','white')
+            .style('stroke-width',3);
         })
-        .on("click", function(d) {
+        .on('click', function(d) {
 
+          // if the user already has generated a graph, and clicks on new
+          // countries, reset everthing
+          if (svg.draw === 'True') {
+            names = []
+            data_line = []
+            clear_lines(svg2)
+            svg.draw = 'False'
+          }
+
+          // country name of selection
           name = Object.values(d.properties)[0]
 
+          // if data is not present, there were no deaths in said country,
+          // so we give an array of eleven zeros as data
           if (data2[name] == null) {
             data_line.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
           }
+          // if there were kills, append data to data_line for line graph
           else {
           data_line.push(data2[name])
           }
 
+          // append names
           names.push(name)
 
-          if (names.length === svg2.line_size) {
-            draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
+          // if selectio is smaller than 5, add names to selected names
+          if (names.length < 4) {
+            selection(svg, name, names.length)
           }
 
-          if (names.length < 5) {
-            selection(svg, name, names.length)
+          // if user selected four countries, draw the line graph
+          if (names.length === 3) {
+            draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
           }
 
         })
@@ -114,28 +136,27 @@ function map(values, nkill) {
           tip.hide(d);
 
           d3.select(this)
-            .style("opacity", 0.8)
-            .style("stroke","white")
-            .style("stroke-width",0.3);
+            .style('opacity', 0.8)
+            .style('stroke','white')
+            .style('stroke-width',0.3);
         });
 
   // world map path
-  svg.append("path")
+  svg.append('path')
       .datum(topojson.mesh(data.features, function(a, b) { return a.id !== b.id; }))
-      .attr("class", "names")
-      .attr("d", path);
+      .attr('class', 'names')
+      .attr('d', path);
 
   // title
   svg.append('text')
-      .attr('class', "title")
+      .attr('class', 'title')
       .style('text-anchor', 'middle')
       .attr('transform', 'translate('+ width / 2 + ',' + 25 + ')')
       .text('Deaths by Terrorism between 2007-2017');
 
-// for (var i = 0; i < 1, i++)
   // title
   svg.append('text')
-      .attr('class', "text")
+      .attr('class', 'text')
       .style('text-anchor', 'middle')
       .attr('transform', 'translate('+ (width - 115) + ',' + 60 + ')')
       .text('Your current selection:');
@@ -151,9 +172,11 @@ function draw_chart(data, svg) {
 
   // margins
   var margin = {top: 310, right: 250, bottom: 25, left: 50},
+
   // width and height
   width = 800 - margin.left - margin.right,
   height = 655 - margin.top - margin.bottom;
+
   // minimal mamximum of line graph
   max = 50
 
@@ -214,7 +237,6 @@ function draw_chart(data, svg) {
   svg2.width = width
   svg2.height = height
 
-  console.log(svg2)
   // button for 2 country line graph
   svg2.append('text')
   .attr('class', "button")
@@ -223,31 +245,9 @@ function draw_chart(data, svg) {
   .on('click', function(d, i) {
     // updates size and clears the line graph
 
-    svg2.len = names.length
+    // svg2.len = names.length
     draw_new_line(svg2, svg, data_line, names, svg2.width, svg2.height)
-    //
-    // svg2.line_size = 2
-    // clear_lines(svg2)
-    // remove_selection(svg)
-    // names = []
-    // data_line = []
   });
-
-  // // button for 2 country line graph
-  // svg2.append('text')
-  // .attr('class', "button")
-  // .attr("transform", "translate(250,25)")
-  // .text('3 countries')
-  // .on('click', function(d, i) {
-  //   // updates size and clears the line graph
-  //   svg2.line_size = 3
-  //   clear_lines(svg2)
-  //   remove_selection(svg)
-  //   names = []
-  //   data_line = []
-  // });
-
-
 
   // return svg for linked views with worldmap
   return svg2
@@ -255,14 +255,21 @@ function draw_chart(data, svg) {
 
 function draw_new_line(svg, svg_map, data, names, width, height){
 
-  max = 0
-  years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
-  colors = ['#fdbb84', '#e34a33',  '#525252']
+  // only draw when the user has not generated a graph before without
+  // resetting the selection
+  if (svg_map.draw === 'False') {
 
+  // year range
+  years = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017]
+  // color range, colorblind safe
+  colors = ['#1b9e77', '#d95f02',  '#7570b3']
+
+  // parsetie function for proper time scales
   var parseTime = d3.timeParse("%Y");
 
   // update maximum of range
-  for (var i = 0; i < svg.len; i++) {
+  max = 0
+  for (var i = 0; i < names.length; i++) {
     current_max = Math.max.apply(Math, data[i])
     if (current_max > max) {
       max = current_max;
@@ -285,18 +292,18 @@ function draw_new_line(svg, svg_map, data, names, width, height){
         return yScale(d); }) // set the y values for the line generator
       .curve(d3.curveMonotoneX) // apply smoothing to the line
 
-  // 5. X scale will use the index of our data
+  // x time scale
   var xScale = d3.scaleTime()
       .domain([parseTime(2007), parseTime(2017)]) // input
       .range([25, width]); // output
 
-  // 6. Y scale will use the randomly generate number
+  // y scale
   var yScale = d3.scaleLinear()
       .domain([0, max]) // input
       .range([height, 0]); // output
 
-for (var i = 0; i < svg.len; i++) {
-  // 9. Append the path, bind the data, and call the line generator
+// draw lines
+for (var i = 0; i < names.length; i++) {
   svg.append("path")
       .datum(data[i]) // 10. Binds data to the line
       .attr("stroke", colors[i])
@@ -317,13 +324,19 @@ for (var i = 0; i < svg.len; i++) {
       .duration(500)
       .call(d3.axisLeft(yScale)); // Create an axis component with d3.axisLeft
 
-  for (var i = 0; i < svg.len; i++) {
-    // 9. Append the path, bind the data, and call the line generator
+  for (var i = 0; i < names.length; i++) {
+    // legend with country names and respective colors
     svg.append('text')
     .attr('class', "legend")
     .attr("transform", "translate(" + (width + 25) + "," + (height / 15 + i * 20) + ")")
     .attr("fill", colors[i])
     .text(names[i])
+  }
+
+    svg_map.draw = "True";
+
+    remove_selection(svg_map)
+
   }
   }
 
@@ -335,13 +348,13 @@ for (var i = 0; i < svg.len; i++) {
 
 
   function color_map(ranges) {
-
     // color coding, I use an aribtray map here, because otherwise it's
     // incredibly difficult to see the other countries besides Iraq and
     // Afghanistan
     let range = d3.scaleLinear()
-       .domain([0, 8000])
-       .range([ranges.min, ranges.max]);
+       .domain([0, 5000])
+       .range([ranges.min, ranges.max])
+    range.clamp(true);
     return range;
 
   }
@@ -366,6 +379,7 @@ for (var i = 0; i < svg.len; i++) {
        .call(legendLinear);
   }
 
+  // updates the selected countries on the world map
   function selection(svg, name, padding) {
 
   svg.append('text')
@@ -373,13 +387,7 @@ for (var i = 0; i < svg.len; i++) {
       .style('text-anchor', 'middle')
       .attr('transform', 'translate('+ (width - 115) + ',' + (60 + (padding * 20)) + ')')
       .text(name);
-
-      return svg
   }
 
-  function remove_selection(svg) {
-
-  d3.selectAll('.selection').remove()
-
-      return svg
-  }
+  // removes selection
+  function remove_selection(svg) {d3.selectAll('.selection').remove()};
