@@ -1,3 +1,5 @@
+# Philip Oosterholt - 10192263 - Dataprocessing Week 6 Linked Views
+
 import pandas as pd
 import csv
 import json

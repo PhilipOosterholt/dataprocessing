@@ -1,3 +1,5 @@
+// Philip Oosterholt - 10192263 - Dataprocessing Week 6 Linked Views
+
 // JSON files
 var files = ["world_countries2.json", "line.json"];
 
