@@ -2,8 +2,6 @@ import pandas as pd
 import csv
 import json
 import numpy as np
-from collections import defaultdict
-
 
 database = 'dataset.csv'
 country_ids = 'list_ids.csv'
@@ -42,7 +40,7 @@ df1['nkill'] = df1['nkill'].round()
 df_new = df2.join(df1['nkill'])
 df_new = df_new.fillna(0)
 
-df_new.to_csv('test.csv')
+df_new.to_csv('deaths.csv')
 
 # make a dictionary
 dictionary = {}
@@ -70,8 +68,6 @@ for x in list_countries:
         kills = country.iloc[i][2]
         dictionary[x][year] = kills
 
-#Get the file name for the new file to write
-# filter = "JSON File (*.json)|*.json|All Files (*.*)|*.*||"
 filename = 'line.json'
 
 # If the file name exists, write a JSON string into the file.
